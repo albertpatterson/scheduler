@@ -32,6 +32,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "testOnce": "react-scripts test --watchAll=false",
+    "testChanged": "react-scripts test --watchAll=false --onlyChanged",
     "eject": "react-scripts eject",
     "serve": "serve -s build",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
@@ -67,7 +69,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged --verbose"
+      "pre-commit": "npm run testOnce && lint-staged --verbose"
     }
   },
   "lint-staged": {
