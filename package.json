@@ -67,7 +67,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged --verbose"
     }
   },
   "lint-staged": {
@@ -78,7 +78,6 @@
     "src/**/*.{js,jsx,ts,tsx}": [
       "prettier --write",
       "eslint --fix"
-    ],
-    "verbose": "true"
+    ]
   }
 }
