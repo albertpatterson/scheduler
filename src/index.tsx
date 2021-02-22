@@ -23,3 +23,4 @@ serviceWorkerRegistration.register();
 reportWebVitals();
 
 const ggasddfdsx = 'sadf';
+console.log(ggasddfdsx);
