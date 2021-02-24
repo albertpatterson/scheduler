@@ -23,6 +23,11 @@ export interface TodoProps {
   actions?: TodoCardAction[];
 }
 
+export const TEST_IDS = {
+  EXPAND_CARD_BUTTON: 'todo-card-show-more-icon',
+  ACTION_MENU_ICON_BUTTON: 'todo-card-action-menu-icon-button',
+};
+
 export const TodoCard: FunctionComponent<TodoProps> = (props: TodoProps) => {
   const todo = props.todo;
   const actions: TodoCardAction[] = props.actions || [];
@@ -47,7 +52,11 @@ export const TodoCard: FunctionComponent<TodoProps> = (props: TodoProps) => {
   const todoActionMenu =
     actions.length === 0 ? null : (
       <>
-        <IconButton aria-label="settings" onClick={handleMenuClick}>
+        <IconButton
+          aria-label="settings"
+          onClick={handleMenuClick}
+          data-testid={TEST_IDS.ACTION_MENU_ICON_BUTTON}
+        >
           <MoreVertIcon />
         </IconButton>
         <Menu
@@ -74,6 +83,7 @@ export const TodoCard: FunctionComponent<TodoProps> = (props: TodoProps) => {
           onClick={handleExpandClick}
           aria-expanded={expanded}
           aria-label="show more"
+          data-testid={TEST_IDS.EXPAND_CARD_BUTTON}
         >
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </IconButton>
@@ -94,3 +104,5 @@ function createTodoActionMenuItem(action: TodoCardAction): ReactElement {
     </MenuItem>
   );
 }
+
+export default TodoCard;
