@@ -1,0 +1,19 @@
+.scheduled-todo-list {
+  padding: 0;
+}
+
+.scheduled-todo-view {
+  display: flex;
+  margin: 24px;
+}
+
+.scheduled-todo-start {
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-items: left;
+}
+
+.scheduled-todo-card {
+  flex: 1;
+}
