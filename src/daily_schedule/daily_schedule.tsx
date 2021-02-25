@@ -3,45 +3,25 @@ import { ScheduledTodo } from '../types';
 import { TodoCard } from '../todo_card/todo_card';
 import './daily_schedule.css';
 import Typography from '@material-ui/core/Typography';
+import { useSelector } from 'react-redux';
+import { SELECTORS } from '../store/selectors';
 
 export interface DailyScheduleProps {
   date?: Date;
 }
 
-const mockScheduledTotos: ScheduledTodo[] = [
-  {
-    start: new Date(Date.now()),
-    title: 'task 1',
-    description: 'the first task',
-    estimate: 30,
-    priority: 0,
-  },
-  {
-    start: new Date(Date.now() + 30 * 60 * 1e3),
-    title: 'task 2',
-    description: 'the second task',
-    estimate: 60,
-    priority: 1,
-  },
-  {
-    start: new Date(Date.now() + (30 + 60) * 60 * 1e3),
-    title: 'task 3',
-    description: 'the third task',
-    estimate: 90,
-    priority: 2,
-  },
-];
-
 export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   props: DailyScheduleProps
 ) => {
+  const scheduledTodos = useSelector(SELECTORS.schedule.scheduledTodos);
+
   return (
     <>
       <Typography variant="h2" align="center" paragraph>
         {parseDate(props.date)}
       </Typography>
       <ul className="scheduled-todo-list">
-        {mockScheduledTotos.map(createScheduledTodoView)}
+        {scheduledTodos.map(createScheduledTodoView)}
       </ul>
     </>
   );

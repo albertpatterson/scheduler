@@ -8,29 +8,10 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { FormControl } from '@material-ui/core';
+import { SELECTORS } from '../store/selectors';
+import { useSelector } from 'react-redux';
 
 export type BacklogProps = unknown;
-
-const mockTotos: Todo[] = [
-  {
-    title: 'task 1',
-    description: 'the first task',
-    estimate: 30,
-    priority: 0,
-  },
-  {
-    title: 'task 2',
-    description: 'the second task',
-    estimate: 60,
-    priority: 1,
-  },
-  {
-    title: 'task 3',
-    description: 'the third task',
-    estimate: 90,
-    priority: 2,
-  },
-];
 
 enum SortByOption {
   TITLE,
@@ -42,6 +23,8 @@ enum SortByOption {
 export const Backlog: FunctionComponent<BacklogProps> = () => {
   const [searchFilter, setSearchFilter] = React.useState<string | null>(null);
   const [sortBy, setSortBy] = React.useState<SortByOption | null>(null);
+
+  const backlogTodos = useSelector(SELECTORS.backlog.backlogTodos);
 
   function handleChangeSortBy(event: ChangeEvent<{ value: unknown }>) {
     const value = (event.target.value as SortByOption) ?? null;
@@ -84,7 +67,7 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
           </FormControl>
         </div>
       </div>
-      <ul className="todo-list">{mockTotos.map(createTodoView)}</ul>
+      <ul className="todo-list">{backlogTodos.map(createTodoView)}</ul>
     </>
   );
 };
