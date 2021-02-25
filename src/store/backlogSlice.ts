@@ -59,7 +59,7 @@ function updateReducer(
   action: PayloadAction<BackLogUpdate>
 ) {
   const update: BackLogUpdate = action.payload;
-  state.backlogTodos[update.index] = update.newTodo;
+  state.backlogTodos.splice(update.index, 0, update.newTodo);
 }
 
 export const { add, remove, update } = backlogSlice.actions;
