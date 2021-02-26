@@ -34,18 +34,24 @@ export const backlogSlice = createSlice({
   name: 'backlog',
   initialState,
   reducers: {
-    add: addReducer,
-    remove: removeReducer,
-    update: updateReducer,
+    addBacklogTodo: addBacklogTodoReducer,
+    removeBacklogTodo: removeBacklogTodoReducer,
+    updateBacklogTodo: updateBacklogTodoReducer,
   },
 });
 
-function addReducer(state: BacklogSlice, action: PayloadAction<Todo>) {
+function addBacklogTodoReducer(
+  state: BacklogSlice,
+  action: PayloadAction<Todo>
+) {
   const newTodo: Todo = action.payload;
   state.backlogTodos.push(newTodo);
 }
 
-function removeReducer(state: BacklogSlice, action: PayloadAction<number>) {
+function removeBacklogTodoReducer(
+  state: BacklogSlice,
+  action: PayloadAction<number>
+) {
   const index: number = action.payload;
   state.backlogTodos.splice(index, 1);
 }
@@ -54,7 +60,7 @@ export interface BackLogUpdate {
   newTodo: Todo;
   index: number;
 }
-function updateReducer(
+function updateBacklogTodoReducer(
   state: BacklogSlice,
   action: PayloadAction<BackLogUpdate>
 ) {
@@ -62,5 +68,9 @@ function updateReducer(
   state.backlogTodos.splice(update.index, 0, update.newTodo);
 }
 
-export const { add, remove, update } = backlogSlice.actions;
+export const {
+  addBacklogTodo,
+  removeBacklogTodo,
+  updateBacklogTodo,
+} = backlogSlice.actions;
 export default backlogSlice.reducer;

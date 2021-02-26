@@ -21,7 +21,7 @@ export enum EditorView {
 
 export interface TodoEditorProps {
   initialTodo?: Todo;
-  handleSubmit: (todo: Todo | null) => void;
+  handleSubmit: (todo: Todo) => void;
   handleCancel: () => void;
   mode?: EditMode;
   view?: EditorView;
@@ -59,7 +59,9 @@ export const TodoEditor: FunctionComponent<TodoEditorProps> = (
       handleTodoChange={handleTodoChange}
       submitDisabled={submitDisabled}
       handleSubmit={() => {
-        props.handleSubmit(currentTodo);
+        if (currentTodo) {
+          props.handleSubmit(currentTodo);
+        }
       }}
       handleCancel={props.handleCancel}
     ></ChosenEditorView>
