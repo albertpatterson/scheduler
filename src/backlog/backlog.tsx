@@ -15,9 +15,17 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { FormControl } from '@material-ui/core';
 import { SELECTORS } from '../store/selectors';
 import { useSelector, useDispatch } from 'react-redux';
-import { addBacklogTodo } from '../store/backlogSlice';
+import {
+  addBacklogTodo,
+  removeBacklogTodo,
+  updateBacklogTodo,
+} from '../store/backlogSlice';
 import Button from '@material-ui/core/Button';
-import TodoEditor, { EditMode, EditorView } from '../todo_editor/todo_editor';
+import TodoEditor, {
+  EditMode,
+  EditorView,
+  TodoEditorProps,
+} from '../todo_editor/todo_editor';
 
 export type BacklogProps = unknown;
 
@@ -45,9 +53,14 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
     setSearchFilter(value);
   }
 
-  function handleAddTodoSubmit(todo: Todo) {
+  function handleEditTodoSubmit(todo: Todo) {
     closeTodoEditor();
-    dispatch(addBacklogTodo(todo));
+    if (editingTodoIndex === null) {
+      dispatch(addBacklogTodo(todo));
+    } else {
+      dispatch(updateBacklogTodo({ newTodo: todo, index: editingTodoIndex }));
+      setEditingTodoIndex(null);
+    }
   }
 
   const [showTodoEditor, setShowTodoEditor] = useState(false);
@@ -64,11 +77,39 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
   const showTodoEditorDialog = showTodoEditor && !smallScreen;
   const showTodoEditorPage = showTodoEditor && smallScreen;
 
+  const [editingTodoIndex, setEditingTodoIndex] = useState<number | null>(null);
+  const editTodo = (index: number) => {
+    setEditingTodoIndex(index);
+    openTodoEditor();
+  };
+
+  const createTodo = () => {
+    setEditingTodoIndex(null);
+    openTodoEditor();
+  };
+
+  const removeTodo = (index: number) => {
+    dispatch(removeBacklogTodo(index));
+  };
+
+  const doTodoToday = (index: number) => {
+    removeTodo(index);
+    console.log(`schedule and add todo # ${index}`);
+  };
+
+  const todoEditorBaseProps: Omit<TodoEditorProps, 'view'> = {
+    handleSubmit: handleEditTodoSubmit,
+    handleCancel: closeTodoEditor,
+    mode: EditMode.CREATE,
+    initialTodo:
+      editingTodoIndex === null ? undefined : backlogTodos[editingTodoIndex],
+  };
+
   const mainPage = (
     <>
       <div className="controls-row">
         <div className="control">
-          <Button color="primary" onClick={openTodoEditor}>
+          <Button color="primary" onClick={createTodo}>
             New Task
           </Button>
         </div>
@@ -100,13 +141,21 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
           </FormControl>
         </div>
       </div>
-      <ul className="todo-list">{backlogTodos.map(createTodoView)}</ul>
+      <ul className="todo-list">
+        {backlogTodos.map((todo, index) =>
+          createTodoView(
+            todo,
+            index,
+            () => doTodoToday(index),
+            () => editTodo(index),
+            () => removeTodo(index)
+          )
+        )}
+      </ul>
       {showTodoEditorDialog && (
         <TodoEditor
-          handleSubmit={handleAddTodoSubmit}
-          handleCancel={closeTodoEditor}
+          {...todoEditorBaseProps}
           view={EditorView.DIALOG}
-          mode={EditMode.CREATE}
         ></TodoEditor>
       )}
     </>
@@ -118,30 +167,34 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
         mainPage
       ) : (
         <TodoEditor
-          handleSubmit={handleAddTodoSubmit}
-          handleCancel={closeTodoEditor}
+          {...todoEditorBaseProps}
           view={EditorView.PAGE}
-          mode={EditMode.CREATE}
         ></TodoEditor>
       )}
     </>
   );
 };
 
-function createTodoView(todo: Todo): ReactElement {
+function createTodoView(
+  todo: Todo,
+  index: number,
+  doTodoToday: () => void,
+  editTodo: () => void,
+  removeTodo: () => void
+): ReactElement {
   const key = todo.title + todo.description;
   const actions = [
     {
       name: 'Do Today',
-      execute: () => {
-        console.log(todo.title + ' Do Today!');
-      },
+      execute: doTodoToday,
     },
     {
-      name: 'Delete',
-      execute: () => {
-        console.log(todo.title + ' Delete');
-      },
+      name: 'Edit',
+      execute: editTodo,
+    },
+    {
+      name: 'Remove',
+      execute: removeTodo,
     },
   ];
   return (

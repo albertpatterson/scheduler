@@ -44,7 +44,7 @@ function updateSchedultedTodoReducer(
   action: PayloadAction<BackLogUpdate>
 ) {
   const update: BackLogUpdate = action.payload;
-  state.scheduledTodos.splice(update.index, 0, update.newScheduledTodo);
+  state.scheduledTodos.splice(update.index, 1, update.newScheduledTodo);
 }
 
 export const {

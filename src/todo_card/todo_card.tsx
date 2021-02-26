@@ -18,7 +18,7 @@ export interface TodoCardAction {
   execute: () => void;
 }
 
-export interface TodoProps {
+export interface TodoCardProps {
   todo: Todo;
   actions?: TodoCardAction[];
 }
@@ -28,7 +28,9 @@ export const TEST_IDS = {
   ACTION_MENU_ICON_BUTTON: 'todo-card-action-menu-icon-button',
 };
 
-export const TodoCard: FunctionComponent<TodoProps> = (props: TodoProps) => {
+export const TodoCard: FunctionComponent<TodoCardProps> = (
+  props: TodoCardProps
+) => {
   const todo = props.todo;
   const actions: TodoCardAction[] = props.actions || [];
 
