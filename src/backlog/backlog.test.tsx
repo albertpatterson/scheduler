@@ -1,16 +1,10 @@
 import React, { ReactElement } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Backlog from './backlog';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import { addBacklogTodo, BacklogSlice } from '../store/backlogSlice';
 import { Provider } from 'react-redux';
-import {
-  TodoEditorProps,
-  EditMode as mockEditMode,
-  EditorView as mockEditorView,
-} from '../todo_editor/todo_editor';
+import { TodoEditorProps } from '../todo_editor/todo_editor';
 import { Todo } from '../types';
 
 const mockStore = configureStore();
