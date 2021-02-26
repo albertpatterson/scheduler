@@ -5,22 +5,25 @@ import { Header } from './header/header';
 import DailySchedule from './daily_schedule/daily_schedule';
 import Backlog from './backlog/backlog';
 import 'fontsource-roboto';
+import Container from '@material-ui/core/Container';
 
 function App(): ReactElement {
   return (
     <>
       <Header></Header>
-      <Switch>
-        <Route path="/daily_schedule">
-          <DailySchedule></DailySchedule>
-        </Route>
-        <Route path="/backlog">
-          <Backlog></Backlog>
-        </Route>
-        <Route path="/">
-          <DailySchedule date={new Date()}></DailySchedule>
-        </Route>
-      </Switch>
+      <Container>
+        <Switch>
+          <Route path="/daily_schedule">
+            <DailySchedule></DailySchedule>
+          </Route>
+          <Route path="/backlog">
+            <Backlog></Backlog>
+          </Route>
+          <Route path="/">
+            <DailySchedule date={new Date()}></DailySchedule>
+          </Route>
+        </Switch>
+      </Container>
     </>
   );
 }
