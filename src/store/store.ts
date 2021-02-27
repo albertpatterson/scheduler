@@ -4,7 +4,7 @@ import {
   createSerializableStateInvariantMiddleware,
 } from '@reduxjs/toolkit';
 import backlogReducer from './backlogSlice';
-import scheduleReducer from './scheduleSlice';
+import scheduleReducer from './scheduleSlice/scheduleSlice';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isNonPlainSerializable = (value: any) => value instanceof Date;

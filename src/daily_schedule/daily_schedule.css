@@ -17,3 +17,8 @@
 .scheduled-todo-card {
   flex: 1;
 }
+
+.controls-row-schedule {
+  display: flex;
+  justify-content: center;
+}

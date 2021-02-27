@@ -21,11 +21,7 @@ import {
   updateBacklogTodo,
 } from '../store/backlogSlice';
 import Button from '@material-ui/core/Button';
-import TodoEditor, {
-  EditMode,
-  EditorView,
-  TodoEditorProps,
-} from '../todo_editor/todo_editor';
+import TodoEditor, { EditMode, EditorView } from '../todo_editor/todo_editor';
 
 export type BacklogProps = unknown;
 
@@ -74,8 +70,6 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
   }
 
   const smallScreen = true;
-  const showTodoEditorDialog = showTodoEditor && !smallScreen;
-  const showTodoEditorPage = showTodoEditor && smallScreen;
 
   const [editingTodoIndex, setEditingTodoIndex] = useState<number | null>(null);
   const editTodo = (index: number) => {
@@ -97,15 +91,7 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
     console.log(`schedule and add todo # ${index}`);
   };
 
-  const todoEditorBaseProps: Omit<TodoEditorProps, 'view'> = {
-    handleSubmit: handleEditTodoSubmit,
-    handleCancel: closeTodoEditor,
-    mode: EditMode.CREATE,
-    initialTodo:
-      editingTodoIndex === null ? undefined : backlogTodos[editingTodoIndex],
-  };
-
-  const mainPage = (
+  return (
     <>
       <div className="controls-row">
         <div className="control">
@@ -152,23 +138,18 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
           )
         )}
       </ul>
-      {showTodoEditorDialog && (
+      {showTodoEditor && (
         <TodoEditor
-          {...todoEditorBaseProps}
+          handleSubmit={handleEditTodoSubmit}
+          handleCancel={closeTodoEditor}
+          mode={EditMode.CREATE}
+          initialTodo={
+            editingTodoIndex === null
+              ? undefined
+              : backlogTodos[editingTodoIndex]
+          }
           view={EditorView.DIALOG}
-        ></TodoEditor>
-      )}
-    </>
-  );
-
-  return (
-    <>
-      {!showTodoEditorPage ? (
-        mainPage
-      ) : (
-        <TodoEditor
-          {...todoEditorBaseProps}
-          view={EditorView.PAGE}
+          fullscreen={smallScreen}
         ></TodoEditor>
       )}
     </>

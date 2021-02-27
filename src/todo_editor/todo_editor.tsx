@@ -25,6 +25,7 @@ export interface TodoEditorProps {
   handleCancel: () => void;
   mode?: EditMode;
   view?: EditorView;
+  fullscreen?: boolean;
 }
 
 const CREATE_TODO_TITLE = 'Create a Task';
@@ -64,6 +65,7 @@ export const TodoEditor: FunctionComponent<TodoEditorProps> = (
         }
       }}
       handleCancel={props.handleCancel}
+      fullscreen={props.fullscreen}
     ></ChosenEditorView>
   );
 };
@@ -75,13 +77,12 @@ interface TodoEditorViewProps {
   submitDisabled: boolean;
   handleSubmit: () => void;
   handleCancel: () => void;
+  fullscreen?: boolean;
 }
 
 const TodoEditorPage: FunctionComponent<TodoEditorViewProps> = (
   props: TodoEditorViewProps
 ) => {
-  // console.log('submit disabled', props.submitDisabled, props);
-
   return (
     <>
       <Typography variant="h4" align="center" paragraph>
@@ -116,7 +117,11 @@ const TodoEditorDialog: FunctionComponent<TodoEditorViewProps> = (
   props: TodoEditorViewProps
 ) => {
   return (
-    <Dialog aria-labelledby={props.title} open={true}>
+    <Dialog
+      aria-labelledby={props.title}
+      open={true}
+      fullScreen={props.fullscreen}
+    >
       <DialogTitle>{props.title}</DialogTitle>
       <DialogContent>
         <TodoEditorBase
