@@ -7,7 +7,6 @@ import {
   removeScheduledTodo,
   updateScheduledTodo,
 } from '../store/scheduleSlice/scheduleSlice';
-import { calculateFinish } from '../store/scheduleSlice/utils';
 import { Provider } from 'react-redux';
 import { ScheduledTodo, Todo } from '../types';
 import { ScheduleSlice } from '../store/scheduleSlice/scheduleSlice';
