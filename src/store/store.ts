@@ -1,7 +1,7 @@
 import {
   configureStore,
+  ConfigureStoreOptions,
   isPlain,
-  createSerializableStateInvariantMiddleware,
 } from '@reduxjs/toolkit';
 import backlogReducer from './backlogSlice';
 import scheduleReducer from './scheduleSlice/scheduleSlice';
@@ -13,17 +13,20 @@ const isNonPlainSerializable = (value: any) => value instanceof Date;
 const isSerializable = (value: any) =>
   isPlain(value) || isNonPlainSerializable(value);
 
-const serializableMiddleware = createSerializableStateInvariantMiddleware({
-  isSerializable,
-});
+export const configuraStoreOptions: Omit<ConfigureStoreOptions, 'reducer'> = {
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: { isSerializable } }),
+};
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     backlog: backlogReducer,
     schedule: scheduleReducer,
   },
-  middleware: [serializableMiddleware],
+  ...configuraStoreOptions,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
 export default store;

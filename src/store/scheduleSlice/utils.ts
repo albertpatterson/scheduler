@@ -9,7 +9,7 @@ export function addScheduledTodo(
   return getAlignedScheduledTodos(updatedScheduledTodos);
 }
 
-export function addScheduledTodoAtEnd(
+export function addTodoAtEnd(
   newTodo: Todo,
   currentScheduledTodos: ScheduledTodo[]
 ): ScheduledTodo[] {
@@ -44,7 +44,14 @@ export function removeScheduledTodo(
   currentScheduledTodos: ScheduledTodo[]
 ): ScheduledTodo[] {
   const updatedScheduledTodos = currentScheduledTodos.slice();
-  updatedScheduledTodos.splice(index, 1);
+  const removed = updatedScheduledTodos.splice(index, 1);
+  // move the new todo to the front if the first was removed... will require more thought once todos can be completed
+  if (index === 0) {
+    updatedScheduledTodos[0] = {
+      ...updatedScheduledTodos[0],
+      start: removed[0].start,
+    };
+  }
   return getAlignedScheduledTodos(updatedScheduledTodos);
 }
 

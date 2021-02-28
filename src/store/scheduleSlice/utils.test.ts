@@ -1,7 +1,7 @@
 import { ScheduledTodo, Todo } from '../../types';
 import {
   addScheduledTodo,
-  addScheduledTodoAtEnd,
+  addTodoAtEnd,
   removeScheduledTodo,
   updateScheduledTodo,
   calculateFinish,
@@ -110,12 +110,9 @@ describe('addScheduledTodo', () => {
   });
 });
 
-describe('addScheduledTodoAtEnd', () => {
+describe('addTodoAtEnd', () => {
   test('adds a todo at the end', () => {
-    const updatedScheduledTodos = addScheduledTodoAtEnd(
-      TEST_TODO,
-      TEST_SCHEDULED_TODOS
-    );
+    const updatedScheduledTodos = addTodoAtEnd(TEST_TODO, TEST_SCHEDULED_TODOS);
 
     const expectedTodoOrder = [...TEST_SCHEDULED_TODOS, TEST_TODO];
 

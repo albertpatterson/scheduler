@@ -1,4 +1,9 @@
-import React, { FunctionComponent, ReactElement, useState } from 'react';
+import React, {
+  FunctionComponent,
+  ReactElement,
+  useState,
+  useEffect,
+} from 'react';
 import { ScheduledTodo, Todo } from '../types';
 import { TodoCard } from '../todo_card/todo_card';
 import './daily_schedule.css';
@@ -6,60 +11,31 @@ import Typography from '@material-ui/core/Typography';
 import { useSelector, useDispatch } from 'react-redux';
 import { SELECTORS } from '../store/selectors';
 import {
-  addScheduledTodo,
-  addScheduledTodoAtEnd,
+  addTodoAtEnd,
   removeScheduledTodo,
   updateScheduledTodo,
+  loadScheduledTodos,
 } from '../store/scheduleSlice/scheduleSlice';
+import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
 import { addBacklogTodo } from '../store/backlogSlice';
 import { TodoEditor, EditMode, EditorView } from '../todo_editor/todo_editor';
 import Button from '@material-ui/core/Button';
-
-const mockScheduledTotos: ScheduledTodo[] = [
-  {
-    start: new Date(Date.now()),
-    title: 'task 1',
-    description: 'the first task',
-    estimate: 30,
-    priority: 0,
-  },
-  {
-    start: new Date(Date.now() + 30 * 60 * 1e3),
-    title: 'task 2',
-    description: 'the second task',
-    estimate: 60,
-    priority: 1,
-  },
-  {
-    start: new Date(Date.now() + (30 + 60) * 60 * 1e3),
-    title: 'task 3',
-    description: 'the third task',
-    estimate: 90,
-    priority: 2,
-  },
-];
 export interface DailyScheduleProps {
   date?: Date;
 }
 
-let added = false;
-
 export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   props: DailyScheduleProps
 ) => {
+  const todoDate = props.date || new Date();
+
   const scheduledTodos = useSelector(SELECTORS.schedule.scheduledTodos);
 
   const dispatch = useDispatch();
 
-  setTimeout(() => {
-    if (!added) {
-      added = true;
-
-      for (const scheduledTodo of mockScheduledTotos) {
-        dispatch(addScheduledTodo(scheduledTodo));
-      }
-    }
-  });
+  useEffect(() => {
+    dispatchAsyncThunk(dispatch, loadScheduledTodos, todoDate);
+  }, [todoDate]);
 
   const [showTodoEditor, setShowTodoEditor] = useState(false);
 
@@ -85,7 +61,7 @@ export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   };
 
   const removeTodo = (index: number) => {
-    dispatch(removeScheduledTodo(index));
+    dispatchAsyncThunk(dispatch, removeScheduledTodo, { index });
   };
 
   const moveToBacklog = (index: number) => {
@@ -96,16 +72,14 @@ export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   function handleEditTodoSubmit(todo: Todo) {
     closeTodoEditor();
     if (editingTodoIndex === null) {
-      dispatch(addScheduledTodoAtEnd(todo));
+      dispatchAsyncThunk(dispatch, addTodoAtEnd, { todo });
     } else {
       const currentScheduledTodo = scheduledTodos[editingTodoIndex];
       const updatedScheduledTodo = { ...currentScheduledTodo, ...todo };
-      dispatch(
-        updateScheduledTodo({
-          newScheduledTodo: updatedScheduledTodo,
-          index: editingTodoIndex,
-        })
-      );
+      dispatchAsyncThunk(dispatch, updateScheduledTodo, {
+        updatedScheduledTodo,
+        index: editingTodoIndex,
+      });
     }
   }
 
