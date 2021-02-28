@@ -39,7 +39,7 @@ interface PutScheduledTodosResponse {
 }
 
 class ScheduledTodosClient {
-  get(date: Date): Promise<GetScheduledTodosResponse> {
+  get(date: Date): Promise<GetScheduledTodosResponse | Error> {
     return Promise.resolve({
       date,
       scheduledTodos: mockScheduledTotos,
@@ -52,13 +52,12 @@ class ScheduledTodosClient {
     date: Date,
     scheduledTodos: ScheduledTodo[]
   ): Promise<PutScheduledTodosResponse | Error> {
-    // return Promise.resolve({
-    //   date,
-    //   scheduledTodos: scheduledTodos,
-    //   status: 200,
-    //   error: null,
-    // });
-    return Promise.reject(new Error('not a valid user'));
+    return Promise.resolve({
+      date,
+      scheduledTodos: scheduledTodos,
+      status: 200,
+      error: null,
+    });
   }
 }
 
