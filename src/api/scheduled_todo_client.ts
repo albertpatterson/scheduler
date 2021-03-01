@@ -39,7 +39,7 @@ interface PutScheduledTodosResponse {
 }
 
 class ScheduledTodosClient {
-  get(date: Date): Promise<GetScheduledTodosResponse | Error> {
+  get(date: Date): Promise<GetScheduledTodosResponse> {
     return Promise.resolve({
       date,
       scheduledTodos: mockScheduledTotos,
@@ -51,7 +51,7 @@ class ScheduledTodosClient {
   put(
     date: Date,
     scheduledTodos: ScheduledTodo[]
-  ): Promise<PutScheduledTodosResponse | Error> {
+  ): Promise<PutScheduledTodosResponse> {
     return Promise.resolve({
       date,
       scheduledTodos: scheduledTodos,

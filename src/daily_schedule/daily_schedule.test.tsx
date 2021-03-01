@@ -13,7 +13,9 @@ import { ScheduleSlice } from '../store/scheduleSlice/scheduleSlice';
 import getTodoCardMocks from '../todo_card/testing/todo_card_mocks';
 import getTodoEditorMocks from '../todo_editor/testing/todo_editor_mocks';
 import thunk from 'redux-thunk';
-import * as dispatch_async_thunk from '../store/dispatch_async_thunk';
+import * as dispatchAsyncThunk from '../store/dispatch_async_thunk';
+import * as reactRedux from 'react-redux';
+import { Dispatch, Action } from 'redux';
 
 jest.mock('../todo_editor/todo_editor');
 jest.mock('../todo_card/todo_card');
@@ -41,14 +43,20 @@ describe('Daily Schedule', () => {
   let wrappedComponent: ReactElement;
   let store = mockStore({});
   let dispatchAsyncThunkSpy: jest.SpiedFunction<
-    typeof dispatch_async_thunk.dispatchAsyncThunk
+    typeof dispatchAsyncThunk.dispatchAsyncThunk
   >;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let dispatchSpy: Dispatch<Action<any>>;
 
   beforeEach(() => {
     dispatchAsyncThunkSpy = jest.spyOn(
-      dispatch_async_thunk,
+      dispatchAsyncThunk,
       'dispatchAsyncThunk'
     );
+
+    dispatchSpy = jest.fn();
+
+    jest.spyOn(reactRedux, 'useDispatch').mockReturnValue(dispatchSpy);
 
     const scheduleSlice: ScheduleSlice = {
       scheduledTodos: [TEST_SCHEDULED_TODO],
@@ -91,7 +99,7 @@ describe('Daily Schedule', () => {
 
     await waitFor(() =>
       expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
-        expect.any(Function),
+        dispatchSpy,
         addTodoAtEnd,
         {
           todo: TEST_TODO,
@@ -118,7 +126,7 @@ describe('Daily Schedule', () => {
     );
 
     expect(dispatchAsyncThunkSpy).not.toHaveBeenCalledWith(
-      expect.any(Function),
+      dispatchSpy,
       addTodoAtEnd,
       expect.any(Object)
     );
@@ -140,7 +148,7 @@ describe('Daily Schedule', () => {
 
     await waitFor(() =>
       expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
-        expect.any(Function),
+        dispatchSpy,
         updateScheduledTodo,
         {
           updatedScheduledTodo: newScheduledTodo,
@@ -159,7 +167,7 @@ describe('Daily Schedule', () => {
 
     await waitFor(() =>
       expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
-        expect.any(Function),
+        dispatchSpy,
         removeScheduledTodo,
         expect.objectContaining({ index: 0 })
       )
