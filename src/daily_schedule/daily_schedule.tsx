@@ -20,22 +20,29 @@ import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
 import { addBacklogTodo } from '../store/backlogSlice/backlogSlice';
 import { TodoEditor, EditMode, EditorView } from '../todo_editor/todo_editor';
 import Button from '@material-ui/core/Button';
+import { getTodayDateNumber, getDayNumber, getDate } from '../utils/utils';
+
 export interface DailyScheduleProps {
-  date?: Date;
+  dateNumber?: number;
 }
 
 export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   props: DailyScheduleProps
 ) => {
-  const todoDate = props.date || new Date();
+  const newDate = new Date();
+  const dayNumber = getDayNumber(newDate);
+  const reformedDate = getDate(dayNumber);
+  console.log('dates', { newDate, dayNumber, reformedDate });
+
+  const todoDateNumber = props.dateNumber || getTodayDateNumber();
 
   const scheduledTodos = useSelector(SELECTORS.schedule.scheduledTodos);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatchAsyncThunk(dispatch, loadScheduledTodos, todoDate);
-  }, [todoDate]);
+    dispatchAsyncThunk(dispatch, loadScheduledTodos, todoDateNumber);
+  }, [todoDateNumber]);
 
   const [showTodoEditor, setShowTodoEditor] = useState(false);
 
@@ -88,7 +95,7 @@ export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   return (
     <>
       <Typography variant="h2" align="center" paragraph>
-        {parseDate(props.date)}
+        {parseDate(todoDateNumber)}
       </Typography>
       <ul className="scheduled-todo-list">
         {scheduledTodos.map((scheduledTodo, index) =>
@@ -171,23 +178,19 @@ function parseStartTime(start: Date) {
   return `${hours}:${paddedMins} ${ampm}`;
 }
 
-function parseDate(date?: Date) {
+function parseDate(dateNumber: number) {
   const todayLabel = 'Today';
 
-  if (!date) {
+  if (dateNumber === getTodayDateNumber()) {
     return todayLabel;
   }
 
-  const today = new Date();
+  const date = getDate(dateNumber);
   const dateYear = date.getFullYear();
   const dateMonth = date.getMonth();
   const dateDay = date.getDate();
-  const isDateToday =
-    dateYear === today.getFullYear() &&
-    dateMonth === today.getMonth() &&
-    dateDay === today.getDate();
 
-  return isDateToday ? todayLabel : `${dateMonth + 1}/${dateDay}/${dateYear}`;
+  return `${dateMonth + 1}/${dateDay}/${dateYear}`;
 }
 
 export default DailySchedule;

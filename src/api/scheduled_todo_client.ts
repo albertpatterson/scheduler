@@ -1,19 +1,19 @@
-import { promises } from 'dns';
 import { ScheduledTodo } from '../types';
 import { getDayString } from '../utils/utils';
 
 const LOCAL_STORAGE_SCHEDULE_KEY_PREFIX = 'scheduler-scheduled-';
-function getLocalStorageScheduleKey(date: Date) {
-  return LOCAL_STORAGE_SCHEDULE_KEY_PREFIX + getDayString(date);
+function getLocalStorageScheduleKey(dateNumber: number) {
+  return LOCAL_STORAGE_SCHEDULE_KEY_PREFIX + getDayString(dateNumber);
 }
 
-function getLoclStorageScheduledTodos(date: Date): ScheduledTodo[] {
-  const key = getLocalStorageScheduleKey(date);
+function getLoclStorageScheduledTodos(dateNumber: number): ScheduledTodo[] {
+  const key = getLocalStorageScheduleKey(dateNumber);
   const data = localStorage.getItem(key);
   if (!data) {
     return [];
   }
   const parsed = JSON.parse(data);
+
   return parsed
     .map(parseScheduledTodo)
     .filter((item: ScheduledTodo | null) => Boolean(item));
@@ -38,32 +38,32 @@ function parseScheduledTodo(data: any): ScheduledTodo | null {
 }
 
 function setLocalStorageBacklogData(
-  date: Date,
+  dateNumber: number,
   scheduledTodo: ScheduledTodo[]
 ) {
   const stringified = JSON.stringify(scheduledTodo);
-  const key = getLocalStorageScheduleKey(date);
+  const key = getLocalStorageScheduleKey(dateNumber);
   localStorage.setItem(key, stringified);
 }
 
 interface GetScheduledTodosResponse {
-  date: Date;
+  dateNumber: number;
   scheduledTodos?: ScheduledTodo[];
 }
 
 class ScheduledTodosClient {
-  get(date: Date): Promise<GetScheduledTodosResponse> {
+  get(dateNumber: number): Promise<GetScheduledTodosResponse> {
     return Promise.resolve({
-      date,
-      scheduledTodos: getLoclStorageScheduledTodos(date),
+      dateNumber,
+      scheduledTodos: getLoclStorageScheduledTodos(dateNumber),
     });
   }
 
   put(
-    date: Date,
+    dateNumber: number,
     scheduledTodos: ScheduledTodo[]
   ): Promise<Record<string, never>> {
-    setLocalStorageBacklogData(date, scheduledTodos);
+    setLocalStorageBacklogData(dateNumber, scheduledTodos);
     return Promise.resolve({});
   }
 }

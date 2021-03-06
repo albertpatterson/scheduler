@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { ScheduledTodo, Todo } from '../../types';
 import { scheduledTodosClient } from '../../api/scheduled_todo_client';
-import { isSameDay } from '../../utils/utils';
+
 export interface ScheduleSlice {
-  date?: Date;
+  dateNumber?: number;
   scheduledTodos: ScheduledTodo[];
 }
 import * as utils from './utils';
@@ -14,14 +14,17 @@ const initialState: ScheduleSlice = {
 
 export const loadScheduledTodos = createAsyncThunk(
   'scheduledTodos/loadScheduledTodos',
-  async (date: Date) => {
-    const response = await scheduledTodosClient.get(date);
-    return { date: response.date, scheduledTodos: response.scheduledTodos };
+  async (dateNumber: number) => {
+    const response = await scheduledTodosClient.get(dateNumber);
+    return {
+      dateNumber: response.dateNumber,
+      scheduledTodos: response.scheduledTodos,
+    };
   },
   {
-    condition: (date, thunkAPi) => {
+    condition: (dateNumber, thunkAPi) => {
       const { schedule } = thunkAPi.getState() as { schedule: ScheduleSlice };
-      if (schedule.date && isSameDay(date, schedule.date)) {
+      if (schedule.dateNumber && schedule.dateNumber === dateNumber) {
         return false;
       }
     },
@@ -30,8 +33,8 @@ export const loadScheduledTodos = createAsyncThunk(
 
 export const saveScheduledTodos = createAsyncThunk(
   'scheduledTodos/saveScheduledTodos',
-  async (data: { date: Date; scheduledTodos: ScheduledTodo[] }) => {
-    await scheduledTodosClient.put(data.date, data.scheduledTodos);
+  async (data: { dateNumber: number; scheduledTodos: ScheduledTodo[] }) => {
+    await scheduledTodosClient.put(data.dateNumber, data.scheduledTodos);
   }
 );
 
@@ -46,7 +49,7 @@ function createUpdateThenSaveAsyncThunk<T>(
     `scheduledTodos/${updateName}`,
     async (data: T, thunkApi) => {
       const { schedule } = thunkApi.getState() as { schedule: ScheduleSlice };
-      if (!schedule.date) {
+      if (!schedule.dateNumber) {
         throw new Error('date is not set');
       }
 
@@ -61,7 +64,7 @@ function createUpdateThenSaveAsyncThunk<T>(
         thunkApi.dispatch(setScheduledTodos(updatedScheduledTodos));
         thunkApi.dispatch(
           saveScheduledTodos({
-            date: schedule.date,
+            dateNumber: schedule.dateNumber,
             scheduledTodos: updatedScheduledTodos,
           })
         );
@@ -121,9 +124,9 @@ export const scheduleSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(loadScheduledTodos.fulfilled, (state, action) => {
-      const { date, scheduledTodos } = action.payload;
+      const { dateNumber, scheduledTodos } = action.payload;
       state.scheduledTodos = scheduledTodos || [];
-      state.date = date;
+      state.dateNumber = dateNumber;
     });
   },
 });

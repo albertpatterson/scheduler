@@ -20,7 +20,7 @@ function App(): ReactElement {
             <Backlog></Backlog>
           </Route>
           <Route path="/">
-            <DailySchedule date={new Date()}></DailySchedule>
+            <DailySchedule></DailySchedule>
           </Route>
         </Switch>
       </Container>
