@@ -3,7 +3,7 @@ import {
   ConfigureStoreOptions,
   isPlain,
 } from '@reduxjs/toolkit';
-import backlogReducer from './backlogSlice';
+import backlogReducer from './backlogSlice/backlogSlice';
 import scheduleReducer from './scheduleSlice/scheduleSlice';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

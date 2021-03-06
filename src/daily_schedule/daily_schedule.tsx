@@ -17,7 +17,7 @@ import {
   loadScheduledTodos,
 } from '../store/scheduleSlice/scheduleSlice';
 import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
-import { addBacklogTodo } from '../store/backlogSlice';
+import { addBacklogTodo } from '../store/backlogSlice/backlogSlice';
 import { TodoEditor, EditMode, EditorView } from '../todo_editor/todo_editor';
 import Button from '@material-ui/core/Button';
 export interface DailyScheduleProps {
@@ -66,7 +66,9 @@ export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
 
   const moveToBacklog = (index: number) => {
     removeTodo(index);
-    dispatch(addBacklogTodo(scheduledTodos[index]));
+    dispatchAsyncThunk(dispatch, addBacklogTodo, {
+      newTodo: scheduledTodos[index],
+    });
   };
 
   function handleEditTodoSubmit(todo: Todo) {

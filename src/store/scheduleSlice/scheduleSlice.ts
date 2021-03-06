@@ -71,6 +71,7 @@ function createUpdateThenSaveAsyncThunk<T>(
     }
   );
 }
+
 export interface addScheduledTodoData {
   scheduledTodo: ScheduledTodo;
 }
@@ -111,6 +112,7 @@ export const updateScheduledTodo = createUpdateThenSaveAsyncThunk<UpdateSchedule
       currentScheduledTodos
     )
 );
+
 export const scheduleSlice = createSlice({
   name: 'schedule',
   initialState,

@@ -7,12 +7,15 @@ import {
   BacklogSlice,
   removeBacklogTodo,
   updateBacklogTodo,
-} from '../store/backlogSlice';
+} from '../store/backlogSlice/backlogSlice';
 import { Provider } from 'react-redux';
 import { Todo } from '../types';
 
 import getTodoCardMocks from '../todo_card/testing/todo_card_mocks';
 import getTodoEditorMocks from '../todo_editor/testing/todo_editor_mocks';
+import * as dispatchAsyncThunk from '../store/dispatch_async_thunk';
+import * as reactRedux from 'react-redux';
+import { Dispatch, Action } from 'redux';
 
 jest.mock('../todo_editor/todo_editor');
 jest.mock('../todo_card/todo_card');
@@ -29,8 +32,23 @@ const mockTodo: Todo = {
 describe('Backlog', () => {
   let wrappedComponent: ReactElement;
   let store = mockStore({});
+  let dispatchAsyncThunkSpy: jest.SpiedFunction<
+    typeof dispatchAsyncThunk.dispatchAsyncThunk
+  >;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let dispatchSpy: Dispatch<Action<any>>;
 
   beforeEach(() => {
+    dispatchAsyncThunkSpy = jest.spyOn(
+      dispatchAsyncThunk,
+      'dispatchAsyncThunk'
+    );
+
+    dispatchSpy = jest.fn();
+
+    jest.spyOn(reactRedux, 'useDispatch').mockReturnValue(dispatchSpy);
+
     const backlogSlice: BacklogSlice = {
       backlogTodos: [mockTodo],
     };
@@ -73,7 +91,15 @@ describe('Backlog', () => {
 
     todoEditorMocks.doSubmit(mockTodo);
 
-    await waitFor(() => expect(actions).toEqual([addBacklogTodo(mockTodo)]));
+    await waitFor(() =>
+      expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+        dispatchSpy,
+        addBacklogTodo,
+        {
+          newTodo: mockTodo,
+        }
+      )
+    );
   });
 
   test('cancels adding a backlog item', async () => {
@@ -96,7 +122,7 @@ describe('Backlog', () => {
       expect(screen.queryByText(todoEditorMocks.placeholderText)).toBe(null)
     );
 
-    expect(actions).toEqual([]);
+    expect(dispatchAsyncThunkSpy).not.toHaveBeenCalledWith();
   });
 
   test('edits a backlog item', async () => {
@@ -115,9 +141,11 @@ describe('Backlog', () => {
     todoEditorMocks.doSubmit(mockTodo);
 
     await waitFor(() =>
-      expect(actions).toEqual([
-        updateBacklogTodo({ newTodo: mockTodo, index: 0 }),
-      ])
+      expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+        dispatchSpy,
+        updateBacklogTodo,
+        { updatedTodo: mockTodo, index: 0 }
+      )
     );
   });
 
@@ -131,6 +159,12 @@ describe('Backlog', () => {
 
     todoCardMocks.clickAction('Remove');
 
-    await waitFor(() => expect(actions).toEqual([removeBacklogTodo(0)]));
+    await waitFor(() =>
+      expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+        dispatchSpy,
+        removeBacklogTodo,
+        { index: 0 }
+      )
+    );
   });
 });

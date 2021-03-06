@@ -19,9 +19,10 @@ import {
   addBacklogTodo,
   removeBacklogTodo,
   updateBacklogTodo,
-} from '../store/backlogSlice';
+} from '../store/backlogSlice/backlogSlice';
 import Button from '@material-ui/core/Button';
 import TodoEditor, { EditMode, EditorView } from '../todo_editor/todo_editor';
+import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
 
 export type BacklogProps = unknown;
 
@@ -52,9 +53,13 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
   function handleEditTodoSubmit(todo: Todo) {
     closeTodoEditor();
     if (editingTodoIndex === null) {
-      dispatch(addBacklogTodo(todo));
+      dispatchAsyncThunk(dispatch, addBacklogTodo, { newTodo: todo });
     } else {
-      dispatch(updateBacklogTodo({ newTodo: todo, index: editingTodoIndex }));
+      dispatchAsyncThunk(dispatch, updateBacklogTodo, {
+        updatedTodo: todo,
+        index: editingTodoIndex,
+      });
+
       setEditingTodoIndex(null);
     }
   }
@@ -83,7 +88,7 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
   };
 
   const removeTodo = (index: number) => {
-    dispatch(removeBacklogTodo(index));
+    dispatchAsyncThunk(dispatch, removeBacklogTodo, { index });
   };
 
   const doTodoToday = (index: number) => {
