@@ -125,18 +125,6 @@ export const scheduleSlice = createSlice({
       state.scheduledTodos = scheduledTodos || [];
       state.date = date;
     });
-
-    builder.addCase(saveScheduledTodos.pending, (state, action) => {
-      console.log('saveScheduledTodos.pending', action);
-    });
-
-    builder.addCase(saveScheduledTodos.fulfilled, (state, action) => {
-      console.log('saveScheduledTodos.fulfilled', action);
-    });
-
-    builder.addCase(saveScheduledTodos.rejected, (state, action) => {
-      console.log('saveScheduledTodos.rejected', action);
-    });
   },
 });
 

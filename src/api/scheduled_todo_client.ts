@@ -1,63 +1,70 @@
+import { promises } from 'dns';
 import { ScheduledTodo } from '../types';
+import { getDayString } from '../utils/utils';
 
-const mockScheduledTotos: ScheduledTodo[] = [
-  {
-    start: new Date(Date.now()),
-    title: 'task 1',
-    description: 'the first task',
-    estimate: 30,
-    priority: 0,
-  },
-  {
-    start: new Date(Date.now() + 30 * 60 * 1e3),
-    title: 'task 2',
-    description: 'the second task',
-    estimate: 60,
-    priority: 1,
-  },
-  {
-    start: new Date(Date.now() + (30 + 60) * 60 * 1e3),
-    title: 'task 3',
-    description: 'the third task',
-    estimate: 90,
-    priority: 2,
-  },
-];
+const LOCAL_STORAGE_SCHEDULE_KEY_PREFIX = 'scheduler-scheduled-';
+function getLocalStorageScheduleKey(date: Date) {
+  return LOCAL_STORAGE_SCHEDULE_KEY_PREFIX + getDayString(date);
+}
+
+function getLoclStorageScheduledTodos(date: Date): ScheduledTodo[] {
+  const key = getLocalStorageScheduleKey(date);
+  const data = localStorage.getItem(key);
+  if (!data) {
+    return [];
+  }
+  const parsed = JSON.parse(data);
+  return parsed
+    .map(parseScheduledTodo)
+    .filter((item: ScheduledTodo | null) => Boolean(item));
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseScheduledTodo(data: any): ScheduledTodo | null {
+  if (
+    typeof data.description !== 'string' ||
+    typeof data.priority !== 'number' ||
+    typeof data.estimate !== 'number' ||
+    typeof data.title !== 'string' ||
+    typeof data.start !== 'string'
+  ) {
+    return null;
+  }
+
+  return {
+    ...data,
+    start: new Date(data.start),
+  };
+}
+
+function setLocalStorageBacklogData(
+  date: Date,
+  scheduledTodo: ScheduledTodo[]
+) {
+  const stringified = JSON.stringify(scheduledTodo);
+  const key = getLocalStorageScheduleKey(date);
+  localStorage.setItem(key, stringified);
+}
 
 interface GetScheduledTodosResponse {
   date: Date;
   scheduledTodos?: ScheduledTodo[];
-  status: number;
-  error: string | null;
-}
-
-interface PutScheduledTodosResponse {
-  date: Date;
-  scheduledTodos: ScheduledTodo[];
-  status: number;
-  error: string | null;
 }
 
 class ScheduledTodosClient {
   get(date: Date): Promise<GetScheduledTodosResponse> {
     return Promise.resolve({
       date,
-      scheduledTodos: mockScheduledTotos,
-      status: 200,
-      error: null,
+      scheduledTodos: getLoclStorageScheduledTodos(date),
     });
   }
 
   put(
     date: Date,
     scheduledTodos: ScheduledTodo[]
-  ): Promise<PutScheduledTodosResponse> {
-    return Promise.resolve({
-      date,
-      scheduledTodos: scheduledTodos,
-      status: 200,
-      error: null,
-    });
+  ): Promise<Record<string, never>> {
+    setLocalStorageBacklogData(date, scheduledTodos);
+    return Promise.resolve({});
   }
 }
 

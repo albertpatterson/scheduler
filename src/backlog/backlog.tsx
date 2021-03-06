@@ -3,6 +3,7 @@ import React, {
   FunctionComponent,
   ReactElement,
   useState,
+  useEffect,
 } from 'react';
 import { Todo } from '../types';
 import { TodoCard } from '../todo_card/todo_card';
@@ -16,6 +17,7 @@ import { FormControl } from '@material-ui/core';
 import { SELECTORS } from '../store/selectors';
 import { useSelector, useDispatch } from 'react-redux';
 import {
+  loadBacklogTodos,
   addBacklogTodo,
   removeBacklogTodo,
   updateBacklogTodo,
@@ -35,6 +37,11 @@ enum SortByOption {
 
 export const Backlog: FunctionComponent<BacklogProps> = () => {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatchAsyncThunk(dispatch, loadBacklogTodos, {});
+  }, []);
+
   const backlogTodos = useSelector(SELECTORS.backlog.backlogTodos);
 
   const [searchFilter, setSearchFilter] = React.useState<string | null>(null);

@@ -11,6 +11,15 @@ const initialState: BacklogSlice = {
   backlogTodos: [],
 };
 
+export const loadBacklogTodos = createAsyncThunk(
+  'scheduledTodos/loadScheduledTodos',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (data: Record<string, never>) => {
+    const response = await backlogTodosClient.get();
+    return { backlogTodos: response.backlogTodos };
+  }
+);
+
 export const saveBacklogTodos = createAsyncThunk(
   'backlogTodos/saveBacklogTodos',
   async (data: { updatedBacklogTodos: Todo[] }) => {
@@ -81,6 +90,12 @@ export const backlogSlice = createSlice({
   initialState,
   reducers: {
     setBacklogTodos: setBacklogTodosReducer,
+  },
+  extraReducers: (builder) => {
+    builder.addCase(loadBacklogTodos.fulfilled, (state, action) => {
+      const { backlogTodos } = action.payload;
+      state.backlogTodos = backlogTodos || [];
+    });
   },
 });
 
