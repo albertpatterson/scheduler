@@ -22,7 +22,7 @@ jest.mock('../todo_card/todo_card');
 
 const mockStore = configureStore([thunk]);
 
-const FIRST_START = new Date('1/1/2020');
+const FIRST_START = 60 * 9; //9:00 AM;
 
 const TEST_SCHEDULED_TODO: ScheduledTodo = {
   title: 'test scheduled todo title',

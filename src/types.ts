@@ -6,5 +6,5 @@ export interface Todo {
 }
 
 export interface ScheduledTodo extends Todo {
-  start: Date;
+  start: number; //the start minute eg 600 = 60*10 = 10 AM
 }

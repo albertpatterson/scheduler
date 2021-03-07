@@ -1,5 +1,5 @@
 import { ScheduledTodo, Todo } from '../../types';
-import { MS_IN_MIN } from '../../constants';
+import { getNowMinute } from '../../utils/utils';
 
 export function addScheduledTodo(
   newScheduledTodo: ScheduledTodo,
@@ -15,28 +15,23 @@ export function addTodoAtEnd(
 ): ScheduledTodo[] {
   const newScheduledTodo = {
     ...newTodo,
-    start: new Date(getNextStartTime(currentScheduledTodos)),
+    start: getNextStartTime(currentScheduledTodos),
   };
 
   return addScheduledTodo(newScheduledTodo, currentScheduledTodos);
 }
 
-function getNextStartTime(scheduledTodos: ScheduledTodo[]) {
-  if (scheduledTodos.length === 0) {
-    return new Date();
-  }
-
-  let latestAvailableStart = Date.now();
+function getNextStartTime(scheduledTodos: ScheduledTodo[]): number {
+  let latestAvailableStart = getNowMinute();
 
   for (const scheduledTodo of scheduledTodos) {
-    const nextAvailableStart =
-      scheduledTodo.start.valueOf() + scheduledTodo.estimate * MS_IN_MIN;
+    const nextAvailableStart = scheduledTodo.start + scheduledTodo.estimate;
     if (nextAvailableStart > latestAvailableStart) {
       latestAvailableStart = nextAvailableStart;
     }
   }
 
-  return new Date(latestAvailableStart);
+  return latestAvailableStart;
 }
 
 export function removeScheduledTodo(
@@ -112,11 +107,11 @@ function alignStarts(sortedScheduledTodos: ScheduledTodo[]) {
 }
 
 function sortByStartDesc(t1: ScheduledTodo, t2: ScheduledTodo) {
-  const v1 = t1.start.valueOf();
-  const v2 = t2.start.valueOf();
+  const v1 = t1.start;
+  const v2 = t2.start;
   return v1 > v2 ? 1 : v1 === v2 ? 0 : -1;
 }
 
-export function calculateFinish(startTime: Date, estimate: number): Date {
-  return new Date(startTime.valueOf() + estimate * MS_IN_MIN);
+export function calculateFinish(start: number, estimate: number): number {
+  return start + estimate;
 }

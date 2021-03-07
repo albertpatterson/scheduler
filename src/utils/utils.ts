@@ -10,15 +10,26 @@ export function getDayString(dateRep: Date | number): string {
 }
 
 export function getDayNumber(date: Date): number {
-  return Math.floor(date.valueOf() / MS_IN_DAY);
+  const timezoneOffset = getTimezoneOffset();
+
+  return Math.floor((date.valueOf() - timezoneOffset) / MS_IN_DAY);
 }
 
 export function getDate(dayNumber: number): Date {
-  const now = new Date();
-  const timeZoneOffset = now.getTimezoneOffset() * MS_IN_MIN;
-  return new Date(dayNumber * MS_IN_DAY + timeZoneOffset);
+  const timezoneOffset = getTimezoneOffset();
+  const offsetDate = new Date(dayNumber * MS_IN_DAY + timezoneOffset);
+  return offsetDate;
 }
 
 export function getTodayDateNumber(): number {
   return getDayNumber(new Date());
+}
+
+export function getNowMinute(): number {
+  const date = new Date();
+  return date.getHours() * 60 + date.getMinutes();
+}
+
+function getTimezoneOffset() {
+  return new Date().getTimezoneOffset() * MS_IN_MIN;
 }

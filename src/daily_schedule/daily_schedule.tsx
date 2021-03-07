@@ -29,11 +29,6 @@ export interface DailyScheduleProps {
 export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   props: DailyScheduleProps
 ) => {
-  const newDate = new Date();
-  const dayNumber = getDayNumber(newDate);
-  const reformedDate = getDate(dayNumber);
-  console.log('dates', { newDate, dayNumber, reformedDate });
-
   const todoDateNumber = props.dateNumber || getTodayDateNumber();
 
   const scheduledTodos = useSelector(SELECTORS.schedule.scheduledTodos);
@@ -169,11 +164,18 @@ function createScheduledTodoView(
   );
 }
 
-function parseStartTime(start: Date) {
-  const rawHours = start.getHours();
-  const hours = rawHours > 12 ? rawHours - 12 : rawHours;
+function parseStartTime(start: number) {
+  const rawHours = Math.floor(start / 60);
+  const mins = start % (rawHours * 60);
+
+  let hours = rawHours;
+  if (hours === 0) {
+    hours = 12;
+  } else if (hours > 12) {
+    hours -= 12;
+  }
   const ampm = rawHours > 11 ? 'pm' : 'am';
-  const paddedMins = `0${start.getMinutes()}`.slice(-2);
+  const paddedMins = `0${mins}`.slice(-2);
 
   return `${hours}:${paddedMins} ${ampm}`;
 }

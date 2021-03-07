@@ -7,7 +7,7 @@ import {
   calculateFinish,
 } from './utils';
 
-const FIRST_START = new Date('1/1/2020');
+const FIRST_START = 60 * 9; // 9 AM
 const FIRST_ESTIMATE = 30;
 const SECOND_START = calculateFinish(FIRST_START, FIRST_ESTIMATE);
 const SECOND_ESTIMATE = 45;
@@ -55,15 +55,15 @@ const TEST_TODO: Todo = {
 
 function verifyScheduledTodoOrderAndContent(
   expectedTodos: Todo[],
-  expectedStartTimes: Date[],
+  expectedStarts: number[],
   actualScheduledTodos: ScheduledTodo[]
 ) {
-  expect(expectedTodos.length).toBe(expectedStartTimes.length);
-  expect(actualScheduledTodos.length).toBe(expectedStartTimes.length);
+  expect(expectedTodos.length).toBe(expectedStarts.length);
+  expect(actualScheduledTodos.length).toBe(expectedStarts.length);
 
   for (let index = 0; index < expectedTodos.length; index++) {
     const expectedTodo = expectedTodos[index];
-    const expectedStartTime = expectedStartTimes[index];
+    const expectedStartTime = expectedStarts[index];
     const actualScheduledTodo = actualScheduledTodos[index];
 
     expect(actualScheduledTodo.title).toBe(expectedTodo.title);

@@ -42,7 +42,6 @@ export const TodoEditor: FunctionComponent<TodoEditorProps> = (
   const [currentTodo, setCurrentTodo] = useState(props.initialTodo || null);
 
   const handleTodoChange = (todo: Todo | null) => {
-    // console.log('handle todo change', todo);
     setCurrentTodo(todo);
   };
 

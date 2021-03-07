@@ -14,27 +14,7 @@ function getLoclStorageScheduledTodos(dateNumber: number): ScheduledTodo[] {
   }
   const parsed = JSON.parse(data);
 
-  return parsed
-    .map(parseScheduledTodo)
-    .filter((item: ScheduledTodo | null) => Boolean(item));
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseScheduledTodo(data: any): ScheduledTodo | null {
-  if (
-    typeof data.description !== 'string' ||
-    typeof data.priority !== 'number' ||
-    typeof data.estimate !== 'number' ||
-    typeof data.title !== 'string' ||
-    typeof data.start !== 'string'
-  ) {
-    return null;
-  }
-
-  return {
-    ...data,
-    start: new Date(data.start),
-  };
+  return parsed;
 }
 
 function setLocalStorageBacklogData(
