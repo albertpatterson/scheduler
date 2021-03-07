@@ -20,7 +20,7 @@ import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
 import { addBacklogTodo } from '../store/backlogSlice/backlogSlice';
 import { TodoEditor, EditMode, EditorView } from '../todo_editor/todo_editor';
 import Button from '@material-ui/core/Button';
-import { getTodayDateNumber, getDayNumber, getDate } from '../utils/utils';
+import { getTodayDateNumber, getDate } from '../utils/utils';
 
 export interface DailyScheduleProps {
   dateNumber?: number;
