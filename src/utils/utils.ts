@@ -21,7 +21,7 @@ export function getDate(dayNumber: number): Date {
   return offsetDate;
 }
 
-export function getTodayDateNumber(): number {
+export function getTodayDayNumber(): number {
   return getDayNumber(new Date());
 }
 

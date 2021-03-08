@@ -20,24 +20,24 @@ import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
 import { addBacklogTodo } from '../store/backlogSlice/backlogSlice';
 import { TodoEditor, EditMode, EditorView } from '../todo_editor/todo_editor';
 import Button from '@material-ui/core/Button';
-import { getTodayDateNumber, getDate } from '../utils/utils';
+import { getTodayDayNumber, getDate } from '../utils/utils';
 
 export interface DailyScheduleProps {
-  dateNumber?: number;
+  dayNumber?: number;
 }
 
 export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   props: DailyScheduleProps
 ) => {
-  const todoDateNumber = props.dateNumber || getTodayDateNumber();
+  const todoDayNumber = props.dayNumber || getTodayDayNumber();
 
   const scheduledTodos = useSelector(SELECTORS.schedule.scheduledTodos);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatchAsyncThunk(dispatch, loadScheduledTodos, todoDateNumber);
-  }, [todoDateNumber]);
+    dispatchAsyncThunk(dispatch, loadScheduledTodos, todoDayNumber);
+  }, [todoDayNumber]);
 
   const [showTodoEditor, setShowTodoEditor] = useState(false);
 
@@ -90,7 +90,7 @@ export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   return (
     <>
       <Typography variant="h2" align="center" paragraph>
-        {parseDate(todoDateNumber)}
+        {parseDate(todoDayNumber)}
       </Typography>
       <ul className="scheduled-todo-list">
         {scheduledTodos.map((scheduledTodo, index) =>
@@ -180,14 +180,14 @@ function parseStartTime(start: number) {
   return `${hours}:${paddedMins} ${ampm}`;
 }
 
-function parseDate(dateNumber: number) {
+function parseDate(dayNumber: number) {
   const todayLabel = 'Today';
 
-  if (dateNumber === getTodayDateNumber()) {
+  if (dayNumber === getTodayDayNumber()) {
     return todayLabel;
   }
 
-  const date = getDate(dateNumber);
+  const date = getDate(dayNumber);
   const dateYear = date.getFullYear();
   const dateMonth = date.getMonth();
   const dateDay = date.getDate();

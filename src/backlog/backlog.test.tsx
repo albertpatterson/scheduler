@@ -7,7 +7,9 @@ import {
   BacklogSlice,
   removeBacklogTodo,
   updateBacklogTodo,
+  loadBacklogTodos,
 } from '../store/backlogSlice/backlogSlice';
+import { addTodoAtEnd } from '../store/scheduleSlice/scheduleSlice';
 import { Provider } from 'react-redux';
 import { Todo } from '../types';
 
@@ -38,6 +40,15 @@ describe('Backlog', () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let dispatchSpy: Dispatch<Action<any>>;
+
+  function expectOnlyLoadThunkDispatched() {
+    expect(dispatchAsyncThunkSpy).toHaveBeenCalledTimes(1);
+    expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+      dispatchSpy,
+      loadBacklogTodos,
+      {}
+    );
+  }
 
   beforeEach(() => {
     dispatchAsyncThunkSpy = jest.spyOn(
@@ -72,6 +83,9 @@ describe('Backlog', () => {
     getTodoCardMocks();
 
     render(wrappedComponent);
+
+    expectOnlyLoadThunkDispatched();
+
     screen.getByText(mockTodo.title);
   });
 
@@ -82,8 +96,7 @@ describe('Backlog', () => {
 
     render(wrappedComponent);
 
-    const actions = store.getActions();
-    expect(actions).toEqual([]);
+    expectOnlyLoadThunkDispatched();
 
     fireEvent.click(screen.getByRole('button', { name: /new task/i }));
 
@@ -109,8 +122,7 @@ describe('Backlog', () => {
 
     render(wrappedComponent);
 
-    const actions = store.getActions();
-    expect(actions).toEqual([]);
+    expectOnlyLoadThunkDispatched();
 
     fireEvent.click(screen.getByRole('button', { name: /new task/i }));
 
@@ -131,8 +143,7 @@ describe('Backlog', () => {
 
     render(wrappedComponent);
 
-    const actions = store.getActions();
-    expect(actions).toEqual([]);
+    expectOnlyLoadThunkDispatched();
 
     todoCardMocks.clickAction('Edit');
 
@@ -154,10 +165,35 @@ describe('Backlog', () => {
 
     render(wrappedComponent);
 
-    const actions = store.getActions();
-    expect(actions).toEqual([]);
+    expectOnlyLoadThunkDispatched();
 
     todoCardMocks.clickAction('Remove');
+
+    await waitFor(() =>
+      expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+        dispatchSpy,
+        removeBacklogTodo,
+        { index: 0 }
+      )
+    );
+  });
+
+  test('schedules a backlog item', async () => {
+    const todoCardMocks = getTodoCardMocks();
+
+    render(wrappedComponent);
+
+    expectOnlyLoadThunkDispatched();
+
+    todoCardMocks.clickAction('Do Today');
+
+    await waitFor(() =>
+      expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+        dispatchSpy,
+        addTodoAtEnd,
+        { todo: mockTodo }
+      )
+    );
 
     await waitFor(() =>
       expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(

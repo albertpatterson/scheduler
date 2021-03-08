@@ -6,6 +6,7 @@ import {
   addTodoAtEnd,
   removeScheduledTodo,
   updateScheduledTodo,
+  loadScheduledTodos,
 } from '../store/scheduleSlice/scheduleSlice';
 import { Provider } from 'react-redux';
 import { ScheduledTodo, Todo } from '../types';
@@ -16,11 +17,14 @@ import thunk from 'redux-thunk';
 import * as dispatchAsyncThunk from '../store/dispatch_async_thunk';
 import * as reactRedux from 'react-redux';
 import { Dispatch, Action } from 'redux';
+import { getDayNumber } from '../utils/utils';
 
 jest.mock('../todo_editor/todo_editor');
 jest.mock('../todo_card/todo_card');
 
 const mockStore = configureStore([thunk]);
+
+const TEST_DAY_NUMBER = getDayNumber(new Date('1-1-2020'));
 
 const FIRST_START = 60 * 9; //9:00 AM;
 
@@ -48,6 +52,15 @@ describe('Daily Schedule', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let dispatchSpy: Dispatch<Action<any>>;
 
+  function expectOnlyLoadThunkDispatched() {
+    expect(dispatchAsyncThunkSpy).toHaveBeenCalledTimes(1);
+    expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+      dispatchSpy,
+      loadScheduledTodos,
+      TEST_DAY_NUMBER
+    );
+  }
+
   beforeEach(() => {
     dispatchAsyncThunkSpy = jest.spyOn(
       dispatchAsyncThunk,
@@ -66,7 +79,7 @@ describe('Daily Schedule', () => {
 
     wrappedComponent = (
       <Provider store={store}>
-        <DailySchedule />
+        <DailySchedule dayNumber={TEST_DAY_NUMBER} />
       </Provider>
     );
   });
@@ -81,6 +94,9 @@ describe('Daily Schedule', () => {
     getTodoCardMocks();
 
     render(wrappedComponent);
+
+    expectOnlyLoadThunkDispatched();
+
     screen.getByText(TEST_SCHEDULED_TODO.title);
   });
 
@@ -90,6 +106,8 @@ describe('Daily Schedule', () => {
     const todoEditorMocks = getTodoEditorMocks();
 
     render(wrappedComponent);
+
+    expectOnlyLoadThunkDispatched();
 
     fireEvent.click(screen.getByRole('button', { name: /new task/i }));
 
@@ -115,6 +133,8 @@ describe('Daily Schedule', () => {
 
     render(wrappedComponent);
 
+    expectOnlyLoadThunkDispatched();
+
     fireEvent.click(screen.getByRole('button', { name: /new task/i }));
 
     await waitFor(() => screen.getByText(todoEditorMocks.placeholderText));
@@ -137,6 +157,8 @@ describe('Daily Schedule', () => {
     const todoEditorMocks = getTodoEditorMocks();
 
     render(wrappedComponent);
+
+    expectOnlyLoadThunkDispatched();
 
     todoCardMocks.clickAction('Edit');
 
@@ -162,6 +184,8 @@ describe('Daily Schedule', () => {
     const todoCardMocks = getTodoCardMocks();
 
     render(wrappedComponent);
+
+    expectOnlyLoadThunkDispatched();
 
     todoCardMocks.clickAction('Remove');
 

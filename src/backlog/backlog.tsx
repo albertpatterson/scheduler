@@ -22,6 +22,7 @@ import {
   removeBacklogTodo,
   updateBacklogTodo,
 } from '../store/backlogSlice/backlogSlice';
+import { addTodoAtEnd } from '../store/scheduleSlice/scheduleSlice';
 import Button from '@material-ui/core/Button';
 import TodoEditor, { EditMode, EditorView } from '../todo_editor/todo_editor';
 import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
@@ -99,8 +100,9 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
   };
 
   const doTodoToday = (index: number) => {
+    const todo = backlogTodos[index];
+    dispatchAsyncThunk(dispatch, addTodoAtEnd, { todo });
     removeTodo(index);
-    console.log(`schedule and add todo # ${index}`);
   };
 
   return (
