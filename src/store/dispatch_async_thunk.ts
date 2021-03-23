@@ -4,6 +4,7 @@ import { Action } from 'redux';
 
 export function dispatchAsyncThunk<D, R, S, E, A extends Action>(
   dispatch: ThunkDispatch<S, E, A>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   asyncThunk: AsyncThunk<R, D, any>,
   data: D
 ): void {
