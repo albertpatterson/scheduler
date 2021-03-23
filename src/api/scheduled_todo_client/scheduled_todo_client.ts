@@ -1,5 +1,5 @@
-import { ScheduledTodo } from '../types';
-import { getDayString } from '../utils/utils';
+import { ScheduledTodo } from '../../types';
+import { getDayString } from '../../utils/utils';
 
 const LOCAL_STORAGE_SCHEDULE_KEY_PREFIX = 'scheduler-scheduled-';
 function getLocalStorageScheduleKey(dateNumber: number) {
@@ -26,17 +26,9 @@ function setLocalStorageBacklogData(
   localStorage.setItem(key, stringified);
 }
 
-interface GetScheduledTodosResponse {
-  dateNumber: number;
-  scheduledTodos?: ScheduledTodo[];
-}
-
-class ScheduledTodosClient {
-  get(dateNumber: number): Promise<GetScheduledTodosResponse> {
-    return Promise.resolve({
-      dateNumber,
-      scheduledTodos: getLoclStorageScheduledTodos(dateNumber),
-    });
+export class ScheduledTodosClient {
+  get(dateNumber: number): Promise<ScheduledTodo[]> {
+    return Promise.resolve(getLoclStorageScheduledTodos(dateNumber));
   }
 
   put(

@@ -7,10 +7,10 @@ import {
   removeScheduledTodo,
   updateScheduledTodo,
   loadScheduledTodos,
-} from '../store/scheduleSlice/scheduleSlice';
+} from '../store/schedule_slice/schedule_slice';
 import { Provider } from 'react-redux';
 import { ScheduledTodo, Todo } from '../types';
-import { ScheduleSlice } from '../store/scheduleSlice/scheduleSlice';
+import { ScheduleSlice } from '../store/schedule_slice/schedule_slice';
 import getTodoCardMocks from '../todo_card/testing/todo_card_mocks';
 import getTodoEditorMocks from '../todo_editor/testing/todo_editor_mocks';
 import thunk from 'redux-thunk';

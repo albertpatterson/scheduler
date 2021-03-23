@@ -8,8 +8,8 @@ import {
   removeBacklogTodo,
   updateBacklogTodo,
   loadBacklogTodos,
-} from '../store/backlogSlice/backlogSlice';
-import { addTodoAtEnd } from '../store/scheduleSlice/scheduleSlice';
+} from '../store/backlog_slice/backlog_slice';
+import { addTodoAtEnd } from '../store/schedule_slice/schedule_slice';
 import { Provider } from 'react-redux';
 import { Todo } from '../types';
 

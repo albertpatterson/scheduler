@@ -21,8 +21,8 @@ import {
   addBacklogTodo,
   removeBacklogTodo,
   updateBacklogTodo,
-} from '../store/backlogSlice/backlogSlice';
-import { addTodoAtEnd } from '../store/scheduleSlice/scheduleSlice';
+} from '../store/backlog_slice/backlog_slice';
+import { addTodoAtEnd } from '../store/schedule_slice/schedule_slice';
 import Button from '@material-ui/core/Button';
 import TodoEditor, { EditMode, EditorView } from '../todo_editor/todo_editor';
 import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';

@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import backlogReducer from './backlogSlice/backlogSlice';
-import scheduleReducer from './scheduleSlice/scheduleSlice';
+import backlogReducer from './backlog_slice/backlog_slice';
+import scheduleReducer from './schedule_slice/schedule_slice';
 
 export const store = configureStore({
   reducer: {

@@ -15,9 +15,9 @@ import {
   removeScheduledTodo,
   updateScheduledTodo,
   loadScheduledTodos,
-} from '../store/scheduleSlice/scheduleSlice';
+} from '../store/schedule_slice/schedule_slice';
 import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
-import { addBacklogTodo } from '../store/backlogSlice/backlogSlice';
+import { addBacklogTodo } from '../store/backlog_slice/backlog_slice';
 import { TodoEditor, EditMode, EditorView } from '../todo_editor/todo_editor';
 import Button from '@material-ui/core/Button';
 import { getTodayDayNumber, getDate } from '../utils/utils';

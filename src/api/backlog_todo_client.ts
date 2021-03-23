@@ -26,9 +26,9 @@ class BacklogTodosClient {
     });
   }
 
-  put(updatedTodos: Todo[]): Promise<Record<string, never>> {
+  put(updatedTodos: Todo[]): Promise<void> {
     setLocalStorageBacklogData(updatedTodos.slice());
-    return Promise.resolve({});
+    return Promise.resolve();
   }
 }
 
