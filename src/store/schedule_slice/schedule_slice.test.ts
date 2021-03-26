@@ -49,48 +49,6 @@ const TEST_ERROR = 'testing error';
 const TEST_INTERNAL_ERROR = 'testing internal error';
 
 describe('schedule slice', () => {
-  // let scheduledTodosClientMock: ScheduledTodosClientMock;
-
-  // beforeEach(() => {
-  //   scheduledTodosClientMock = scheduledTodosClient as ScheduledTodosClientMock;
-  //   initializeMock(scheduledTodosClientMock);
-  // });
-
-  // test('applies the mock', async () => {
-  //   const out = await scheduledTodosClient.get(0);
-  //   expect(scheduledTodosClient.get).toHaveBeenCalledTimes(1);
-  //   expect(out).toEqual([]);
-  // });
-
-  // test('updates the mock', async () => {
-  //   const testTodos = [
-  //     {
-  //       title: 'test scheduled todo title',
-  //       description: 'test scheduled todo description',
-  //       priority: 100,
-  //       estimate: 750,
-  //       start: 1e3 * 60 * 9,
-  //     },
-  //   ];
-  //   scheduledTodosClientMock.setGetImpl(testTodos);
-
-  //   const out = await scheduledTodosClient.get(0);
-  //   expect(scheduledTodosClient.get).toHaveBeenCalledTimes(1);
-  //   expect(out).toBe(testTodos);
-  // });
-
-  // test('named exports', () => {
-  //   const s = new ScheduledTodosClient();
-  //   expect(ScheduledTodosClient).toHaveBeenCalledTimes(1);
-  //   expect(s).toEqual({});
-
-  //   const out = { pickle: 0 };
-  //   (ScheduledTodosClient as jest.Mock).mockReturnValue(out);
-  //   const s2 = new ScheduledTodosClient();
-  //   expect(ScheduledTodosClient).toHaveBeenCalledTimes(2);
-  //   expect(s2).toEqual(out);
-  // });
-
   describe('loading scheduled todos', () => {
     describe('success', () => {
       test('loadScheduledTodos loads scheduled todos successfully', async () => {

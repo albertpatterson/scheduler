@@ -1,10 +1,8 @@
 import { RootState } from './store';
-import { ScheduledTodo, Todo } from '../types';
+import { Todo } from '../types';
+import { SELECTORS as SCHEDULE_SELECTORS } from './schedule_slice/selectors';
 export const SELECTORS = {
-  schedule: {
-    scheduledTodos: (state: RootState): ScheduledTodo[] =>
-      state.schedule.scheduledTodos,
-  },
+  schedule: SCHEDULE_SELECTORS,
   backlog: {
     backlogTodos: (state: RootState): Todo[] => state.backlog.backlogTodos,
   },

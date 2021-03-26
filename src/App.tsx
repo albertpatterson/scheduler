@@ -6,6 +6,7 @@ import DailySchedule from './daily_schedule/daily_schedule';
 import Backlog from './backlog/backlog';
 import 'fontsource-roboto';
 import Container from '@material-ui/core/Container';
+import ErrorSnackbar from 'error_snackbar/error_snackbar';
 
 function App(): ReactElement {
   return (
@@ -23,6 +24,7 @@ function App(): ReactElement {
             <DailySchedule></DailySchedule>
           </Route>
         </Switch>
+        <ErrorSnackbar />
       </Container>
     </>
   );
