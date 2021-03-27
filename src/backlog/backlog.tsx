@@ -22,7 +22,10 @@ import {
   removeBacklogTodo,
   updateBacklogTodo,
 } from '../store/backlog_slice/backlog_slice';
-import { addTodoAtEnd } from '../store/schedule_slice/schedule_slice';
+import {
+  loadScheduledTodosToday,
+  addTodoAtEnd,
+} from '../store/schedule_slice/schedule_slice';
 import Button from '@material-ui/core/Button';
 import TodoEditor, { EditMode, EditorView } from '../todo_editor/todo_editor';
 import { dispatchAsyncThunk } from '../store/dispatch_async_thunk';
@@ -96,13 +99,28 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
   };
 
   const removeTodo = (index: number) => {
-    dispatchAsyncThunk(dispatch, removeBacklogTodo, { index });
+    return dispatchAsyncThunk(dispatch, removeBacklogTodo, { index });
   };
 
   const doTodoToday = (index: number) => {
     const todo = backlogTodos[index];
-    dispatchAsyncThunk(dispatch, addTodoAtEnd, { todo });
-    removeTodo(index);
+    dispatchAsyncThunk(dispatch, loadScheduledTodosToday, undefined)
+      .then((result) => {
+        if (result.error) {
+          throw result.error;
+        }
+
+        return dispatchAsyncThunk(dispatch, addTodoAtEnd, { todo });
+      })
+      .then((result) => {
+        if (result.error) {
+          throw result.error;
+        }
+
+        return removeTodo(index);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .catch(() => {});
   };
 
   return (

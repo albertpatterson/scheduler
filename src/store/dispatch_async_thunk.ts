@@ -7,6 +7,6 @@ export function dispatchAsyncThunk<D, R, S, E, A extends Action>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   asyncThunk: AsyncThunk<R, D, any>,
   data: D
-): void {
-  dispatch(asyncThunk(data));
+): Promise<any> {
+  return dispatch(asyncThunk(data));
 }

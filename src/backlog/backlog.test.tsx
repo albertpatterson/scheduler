@@ -9,7 +9,10 @@ import {
   updateBacklogTodo,
   loadBacklogTodos,
 } from '../store/backlog_slice/backlog_slice';
-import { addTodoAtEnd } from '../store/schedule_slice/schedule_slice';
+import {
+  loadScheduledTodosToday,
+  addTodoAtEnd,
+} from '../store/schedule_slice/schedule_slice';
 import { Provider } from 'react-redux';
 import { Todo } from '../types';
 
@@ -178,29 +181,59 @@ describe('Backlog', () => {
     );
   });
 
-  test('schedules a backlog item', async () => {
-    const todoCardMocks = getTodoCardMocks();
+  describe('scheduling a backlog item', () => {
+    test('addes the scheduled todo and removes the backlog item', async () => {
+      const todoCardMocks = getTodoCardMocks();
 
-    render(wrappedComponent);
+      render(wrappedComponent);
 
-    expectOnlyLoadThunkDispatched();
+      expectOnlyLoadThunkDispatched();
 
-    todoCardMocks.clickAction('Do Today');
+      dispatchAsyncThunkSpy.mockReturnValue(Promise.resolve({}));
 
-    await waitFor(() =>
-      expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
-        dispatchSpy,
-        addTodoAtEnd,
-        { todo: mockTodo }
-      )
-    );
+      todoCardMocks.clickAction('Do Today');
 
-    await waitFor(() =>
-      expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+      await waitFor(() =>
+        expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+          dispatchSpy,
+          addTodoAtEnd,
+          { todo: mockTodo }
+        )
+      );
+
+      await waitFor(() =>
+        expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+          dispatchSpy,
+          removeBacklogTodo,
+          { index: 0 }
+        )
+      );
+    });
+
+    test('does not remove the backlog item if adding the scheduled todo fails', async () => {
+      const todoCardMocks = getTodoCardMocks();
+
+      render(wrappedComponent);
+
+      expectOnlyLoadThunkDispatched();
+
+      dispatchAsyncThunkSpy.mockReturnValue(Promise.reject('testing error'));
+
+      todoCardMocks.clickAction('Do Today');
+
+      await waitFor(() =>
+        expect(dispatchAsyncThunkSpy).toHaveBeenCalledWith(
+          dispatchSpy,
+          loadScheduledTodosToday,
+          undefined
+        )
+      );
+
+      expect(dispatchAsyncThunkSpy).not.toHaveBeenCalledWith(
         dispatchSpy,
         removeBacklogTodo,
-        { index: 0 }
-      )
-    );
+        expect.any(Object)
+      );
+    });
   });
 });

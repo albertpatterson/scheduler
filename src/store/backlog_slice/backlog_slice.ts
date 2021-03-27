@@ -12,7 +12,7 @@ const initialState: BacklogSlice = {
 };
 
 export const loadBacklogTodos = createAsyncThunk(
-  'scheduledTodos/loadScheduledTodos',
+  'backlogTodos/loadBacklogTodos',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (data: Record<string, never>) => {
     const response = await backlogTodosClient.get();

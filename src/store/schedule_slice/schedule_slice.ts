@@ -1,7 +1,13 @@
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  PayloadAction,
+  createAsyncThunk,
+  AsyncThunkAction,
+} from '@reduxjs/toolkit';
 import { ScheduledTodo, Todo } from '../../types';
 import { scheduledTodosClient } from 'api/scheduled_todo_client/scheduled_todo_client';
 import * as utils from './utils';
+import { getTodayDayNumber } from 'utils/utils';
 
 const DEFAULT_LOAD_SCHEDULED_TODO_ERROR_MESSAGE =
   'An error occured loading scheduled todos';
@@ -70,6 +76,15 @@ export const loadScheduledTodos = createAsyncThunk<
   }
 );
 
+export const loadScheduledTodosToday = (): AsyncThunkAction<
+  LoadScheduledTodosSuccessValue,
+  LoadScheduledTodosPayloadCreatorInput,
+  LoadScheduledTodosThunkApiConfig
+> => {
+  const dateNumber = getTodayDayNumber();
+  return loadScheduledTodos(dateNumber);
+};
+
 type SaveScheduledTodosSuccessValue = Promise<void>;
 
 interface SaveScheduledTodosPayloadCreatorInput {
@@ -106,14 +121,14 @@ function createUpdateThenSaveAsyncThunk<T>(
   const typePrefix = `scheduledTodos/${updateName}`;
 
   return createAsyncThunk(typePrefix, async (data: T, thunkApi) => {
-    const { schedule } = thunkApi.getState() as PartialStoreType;
-    if (schedule.dateNumber === undefined) {
-      throw new Error('date is not set');
-    }
-
-    const currentScheduledTodos = schedule.scheduledTodos || [];
-
     try {
+      const { schedule } = thunkApi.getState() as PartialStoreType;
+      if (schedule.dateNumber === undefined) {
+        throw new Error('date is not set');
+      }
+
+      const currentScheduledTodos = schedule.scheduledTodos || [];
+
       const updatedScheduledTodos = updatedScheduledTodosCreator(
         data,
         currentScheduledTodos
