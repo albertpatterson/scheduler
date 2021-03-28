@@ -1,4 +1,4 @@
-import { ScheduledTodo, Todo } from '../../types';
+import { ScheduledTodo, Todo } from '../../../../types';
 import {
   addScheduledTodo,
   addTodoAtEnd,

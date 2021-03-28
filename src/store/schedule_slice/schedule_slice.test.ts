@@ -1,394 +1,171 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
-import { AnyAction, AsyncThunkAction } from '@reduxjs/toolkit';
-import * as utils from './utils';
+import { scheduleSlice, ScheduleSlice } from './schedule_slice';
 import { ScheduledTodo } from 'types';
+import { loadScheduledTodos } from './load_scheduled_todos';
+import { updateScheduledTodos } from './update_scheduled_todos/update_scheduled_todos_base';
+import { saveScheduledTodos } from './update_scheduled_todos/save_scheduled_todos/save_scheduled_todos';
 
-import {
-  PartialStoreType,
-  loadScheduledTodos,
-  scheduleSlice,
-  ScheduleSlice,
-  addTodoAtEnd,
-  addScheduledTodo,
-} from './schedule_slice';
-
-import { scheduledTodosClient } from 'api/scheduled_todo_client/scheduled_todo_client';
-
-jest.mock('api/scheduled_todo_client/scheduled_todo_client', () => {
-  const scheduledTodosClient = {
-    get: jest.fn(),
-    put: jest.fn(),
-  };
-  return {
-    __esModule: true,
-    default: scheduledTodosClient,
-    scheduledTodosClient,
-  };
-});
-
-const mockStore = configureMockStore([thunk]);
-
-const TODO = {
-  title: 'test  todo',
-  description: 'test todo description',
-  estimate: 1,
-  priority: 1,
+const UNINITIALIZED_STATE: ScheduleSlice = {
+  scheduledTodos: [],
 };
 
-const SCHEDULED_TODO = {
-  start: 0,
+const TEST_TODO = {
   title: 'test scheduled todo',
   description: 'test scheduled todo description',
   estimate: 1,
   priority: 1,
 };
 
-const TEST_ERROR = 'testing error';
-const TEST_INTERNAL_ERROR = 'testing internal error';
+const TEST_START_MINUTE = 123;
 
-describe('schedule slice', () => {
-  describe('loading scheduled todos', () => {
-    describe('success', () => {
-      test('loadScheduledTodos loads scheduled todos successfully', async () => {
-        const testDateNumber = 111;
-        const testScheduledTodos: ScheduledTodo[] = [SCHEDULED_TODO];
+const TEST_SCHEDULED_TODO = {
+  start: TEST_START_MINUTE,
+  ...TEST_TODO,
+};
 
-        const initialState: PartialStoreType = {
-          schedule: {
-            scheduledTodos: [],
-          },
-        };
-        const dispatch = jest.fn();
-        const getState = jest.fn().mockReturnValue(initialState);
+const TEST_SCHEDULED_TODOS: ScheduledTodo[] = [TEST_SCHEDULED_TODO];
 
-        const action = loadScheduledTodos(testDateNumber);
-        (scheduledTodosClient.get as jest.Mock).mockReturnValue(
-          Promise.resolve(testScheduledTodos)
-        );
-        await action(dispatch, getState, null);
+const TEST_DATE_NUMBER = 456;
 
-        expect(scheduledTodosClient.get).toHaveBeenCalledWith(testDateNumber);
+const INITIALIZED_STATE: ScheduleSlice = {
+  dateNumber: TEST_DATE_NUMBER,
+  scheduledTodos: TEST_SCHEDULED_TODOS,
+};
 
-        const pendingAction = expect.objectContaining({
-          payload: undefined,
-          type: 'scheduledTodos/loadScheduledTodos/pending',
-        });
+describe('loadScheduledTodos', () => {
+  describe('when fulfilled', () => {
+    test('sets the dateNumber and scheduledTodos and clears load error', () => {
+      const initialState = {
+        ...UNINITIALIZED_STATE,
+        loadError: 'testing',
+      };
+      const action = {
+        type: loadScheduledTodos.fulfilled.type,
+        payload: INITIALIZED_STATE,
+      };
+      const expectedState = INITIALIZED_STATE;
 
-        const fulfilledAction = expect.objectContaining({
-          payload: {
-            dateNumber: testDateNumber,
-            scheduledTodos: testScheduledTodos,
-          },
-          type: 'scheduledTodos/loadScheduledTodos/fulfilled',
-        });
+      const actualState = scheduleSlice.reducer(initialState, action);
 
-        expect(dispatch).toHaveBeenCalledTimes(2);
-        expect(dispatch).toHaveBeenNthCalledWith(1, pendingAction);
-        expect(dispatch).toHaveBeenNthCalledWith(2, fulfilledAction);
-      });
-
-      test('updates the state once async thunk is fulfilled', () => {
-        const testDateNumber = 1111;
-
-        const initialState: ScheduleSlice = {
-          scheduledTodos: [],
-          loadError: 'test loading error',
-        };
-
-        const loadedScheduledTodos = [SCHEDULED_TODO];
-        const action = {
-          payload: {
-            dateNumber: testDateNumber,
-            scheduledTodos: loadedScheduledTodos,
-          },
-          type: 'scheduledTodos/loadScheduledTodos/fulfilled',
-        };
-
-        const newState = scheduleSlice.reducer(initialState, action);
-
-        expect(newState).toEqual({
-          dateNumber: testDateNumber,
-          scheduledTodos: loadedScheduledTodos,
-          loadError: undefined,
-        });
-      });
-    });
-
-    describe('failure', () => {
-      test('loadScheduledTodos handles get scheuled todos error', async () => {
-        const testDateNumber = 111;
-        const testError = 'test error';
-
-        const initialState: PartialStoreType = {
-          schedule: {
-            scheduledTodos: [],
-          },
-        };
-        const dispatch = jest.fn();
-        const getState = jest.fn().mockReturnValue(initialState);
-
-        (scheduledTodosClient.get as jest.Mock).mockReturnValue(
-          Promise.reject(testError)
-        );
-
-        const action = loadScheduledTodos(testDateNumber);
-        await action(dispatch, getState, null);
-
-        expect(scheduledTodosClient.get).toHaveBeenCalledWith(testDateNumber);
-
-        const pendingAction = expect.objectContaining({
-          payload: undefined,
-          type: 'scheduledTodos/loadScheduledTodos/pending',
-        });
-
-        const rejectedAction = expect.objectContaining({
-          payload: {
-            dateNumber: testDateNumber,
-            error: testError,
-          },
-          type: 'scheduledTodos/loadScheduledTodos/rejected',
-        });
-
-        expect(dispatch).toHaveBeenCalledTimes(2);
-        expect(dispatch).toHaveBeenNthCalledWith(1, pendingAction);
-        expect(dispatch).toHaveBeenNthCalledWith(2, rejectedAction);
-      });
-
-      test('updates the state once async thunk is rejected', () => {
-        const testDateNumber = 1111;
-        const testLoadingError = 'test loading error';
-
-        const initialState: ScheduleSlice = {
-          scheduledTodos: [SCHEDULED_TODO],
-        };
-
-        const action = {
-          payload: {
-            error: { message: testLoadingError },
-            dateNumber: testDateNumber,
-            scheduledTodos: [],
-          },
-          type: 'scheduledTodos/loadScheduledTodos/rejected',
-        };
-
-        const newState = scheduleSlice.reducer(initialState, action);
-
-        expect(newState).toEqual({
-          dateNumber: testDateNumber,
-          scheduledTodos: [],
-          loadError: testLoadingError,
-        });
-      });
+      expect(actualState).toEqual(expectedState);
     });
   });
 
-  describe('updating scheduled todos', () => {
-    function testUpdateScheduledTodos<A, B, C>(
-      asyncThunkName: string,
-      internalUtilFunctionName: string,
-      asyncThunkAction: AsyncThunkAction<A, B, C>,
-      expectedPutDateNumber: number,
-      expectedPutScheduledTodos: any[],
-      expectedSuccessActions: AnyAction[],
-      expectedFailureActions: AnyAction[],
-      expectedInternalFailureActions: AnyAction[]
-    ) {
-      function getStore() {
-        const initialState: PartialStoreType = {
-          schedule: {
-            dateNumber: 0,
-            scheduledTodos: [],
-          },
-        };
+  describe('when rejected', () => {
+    test('sets the dateNumber and loadError', () => {
+      const initialState = UNINITIALIZED_STATE;
 
-        return mockStore(initialState);
-      }
+      const testError = 'testing load error';
 
-      async function dispatchAndAsssertActions(
-        expectedActions: AnyAction[],
-        skipPutAssertions = false
-      ) {
-        const store = getStore();
+      const action = {
+        type: loadScheduledTodos.rejected.type,
+        payload: {
+          dateNumber: TEST_DATE_NUMBER,
+          error: { message: testError },
+        },
+      };
 
-        await store.dispatch<any>(asyncThunkAction);
+      const expectedState = {
+        dateNumber: TEST_DATE_NUMBER,
+        loadError: testError,
+        scheduledTodos: [],
+      };
 
-        const actions = store.getActions();
+      const actualState = scheduleSlice.reducer(initialState, action);
 
-        expect(actions.length).toBe(expectedActions.length);
-
-        for (const action of expectedActions) {
-          expect(actions).toContainEqual(action);
-        }
-
-        if (skipPutAssertions) {
-          return;
-        }
-
-        expect(scheduledTodosClient.put).toHaveBeenCalledWith(
-          expectedPutDateNumber,
-          expectedPutScheduledTodos
-        );
-      }
-
-      test(`${asyncThunkName} success`, async () => {
-        (scheduledTodosClient.put as jest.Mock).mockReturnValue(
-          Promise.resolve()
-        );
-
-        dispatchAndAsssertActions(expectedSuccessActions);
-      });
-
-      test(`${asyncThunkName} request failure`, async () => {
-        (scheduledTodosClient.put as jest.Mock).mockReturnValue(
-          Promise.reject(TEST_ERROR)
-        );
-
-        dispatchAndAsssertActions(expectedFailureActions);
-      });
-
-      test(`${asyncThunkName} internal failure`, async () => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore: test function type safe
-        jest.spyOn(utils, internalUtilFunctionName).mockImplementation(() => {
-          throw new Error(TEST_INTERNAL_ERROR);
-        });
-
-        dispatchAndAsssertActions(expectedInternalFailureActions, true);
-      });
-    }
-
-    describe('addTodoAtEnd', () => {
-      const expectedSuccessActions: AnyAction[] = [
-        expect.objectContaining({
-          type: 'scheduledTodos/addTodoAtEnd/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/addTodoAtEnd/fulfilled',
-        }),
-        expect.objectContaining({
-          type: 'schedule/setScheduledTodos',
-          payload: [expect.objectContaining(TODO)],
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/fulfilled',
-        }),
-      ];
-
-      const expectedFailureActions: AnyAction[] = [
-        expect.objectContaining({
-          type: 'scheduledTodos/addTodoAtEnd/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/addTodoAtEnd/fulfilled',
-        }),
-        expect.objectContaining({
-          type: 'schedule/setScheduledTodos',
-          payload: [expect.objectContaining(TODO)],
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/rejected',
-          error: expect.objectContaining({ message: TEST_ERROR }),
-        }),
-      ];
-
-      const expectedInternalFailureActions: AnyAction[] = [
-        expect.objectContaining({
-          type: 'scheduledTodos/addTodoAtEnd/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/addTodoAtEnd/rejected',
-          error: expect.objectContaining({ message: TEST_INTERNAL_ERROR }),
-        }),
-        expect.objectContaining({
-          type: 'schedule/setUpdateFailure',
-          payload: TEST_INTERNAL_ERROR,
-        }),
-      ];
-
-      testUpdateScheduledTodos(
-        'addTodoAtEnd',
-        'addTodoAtEnd',
-        addTodoAtEnd({ todo: TODO }),
-        0,
-        [expect.objectContaining(TODO)],
-        expectedSuccessActions,
-        expectedFailureActions,
-        expectedInternalFailureActions
-      );
+      expect(actualState).toEqual(expectedState);
     });
+  });
+});
 
-    describe('addScheduledTodo', () => {
-      const expectedSuccessActions: AnyAction[] = [
-        expect.objectContaining({
-          type: 'scheduledTodos/addScheduledTodo/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/addScheduledTodo/fulfilled',
-        }),
-        expect.objectContaining({
-          type: 'schedule/setScheduledTodos',
-          payload: [expect.objectContaining(TODO)],
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/fulfilled',
-        }),
-      ];
+describe('updateScheduledTodos', () => {
+  describe('when fulfilled', () => {
+    test('sets the scheduledTodos and clears updateError', () => {
+      const initialState = {
+        dateNumber: TEST_DATE_NUMBER,
+        scheduledTodos: [],
+        updateError: 'testing',
+      };
 
-      const expectedFailureActions: AnyAction[] = [
-        expect.objectContaining({
-          type: 'scheduledTodos/addScheduledTodo/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/addScheduledTodo/fulfilled',
-        }),
-        expect.objectContaining({
-          type: 'schedule/setScheduledTodos',
-          payload: [expect.objectContaining(TODO)],
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/saveScheduledTodos/rejected',
-          error: expect.objectContaining({ message: TEST_ERROR }),
-        }),
-      ];
+      const action = {
+        type: updateScheduledTodos.fulfilled.type,
+        payload: INITIALIZED_STATE,
+      };
+      const expectedState = INITIALIZED_STATE;
 
-      const expectedInternalFailureActions: AnyAction[] = [
-        expect.objectContaining({
-          type: 'scheduledTodos/addScheduledTodo/pending',
-        }),
-        expect.objectContaining({
-          type: 'scheduledTodos/addScheduledTodo/rejected',
-          error: expect.objectContaining({ message: TEST_INTERNAL_ERROR }),
-        }),
-        expect.objectContaining({
-          type: 'schedule/setUpdateFailure',
-          payload: TEST_INTERNAL_ERROR,
-        }),
-      ];
+      const actualState = scheduleSlice.reducer(initialState, action);
 
-      testUpdateScheduledTodos(
-        'addScheduledTodo',
-        'addScheduledTodo',
-        addScheduledTodo({ scheduledTodo: { start: 0, ...TODO } }),
-        0,
-        [expect.objectContaining(TODO)],
-        expectedSuccessActions,
-        expectedFailureActions,
-        expectedInternalFailureActions
-      );
+      expect(actualState).toEqual(expectedState);
+    });
+  });
+
+  describe('when rejected', () => {
+    test('sets the updateError and does not change scheduledTodos', () => {
+      const initialState = INITIALIZED_STATE;
+
+      const testError = 'testing update error';
+
+      const action = {
+        type: updateScheduledTodos.rejected.type,
+        payload: {
+          dateNumber: TEST_DATE_NUMBER,
+          error: { message: testError },
+        },
+      };
+
+      const expectedState = {
+        ...INITIALIZED_STATE,
+        updateError: testError,
+      };
+
+      const actualState = scheduleSlice.reducer(initialState, action);
+
+      expect(actualState).toEqual(expectedState);
+    });
+  });
+});
+
+describe('saveScheduledTodos', () => {
+  describe('when fulfilled', () => {
+    test('clears saveError', () => {
+      const initialState = {
+        ...INITIALIZED_STATE,
+        saveError: 'testing',
+      };
+
+      const action = {
+        type: saveScheduledTodos.fulfilled.type,
+        payload: INITIALIZED_STATE,
+      };
+      const expectedState = INITIALIZED_STATE;
+
+      const actualState = scheduleSlice.reducer(initialState, action);
+
+      expect(actualState).toEqual(expectedState);
+    });
+  });
+
+  describe('when rejected', () => {
+    test('sets the save error', () => {
+      const initialState = INITIALIZED_STATE;
+
+      const testError = 'testing save error';
+
+      const action = {
+        type: saveScheduledTodos.rejected.type,
+        payload: {
+          dateNumber: TEST_DATE_NUMBER,
+          error: { message: testError },
+        },
+      };
+
+      const expectedState = {
+        ...INITIALIZED_STATE,
+        saveError: testError,
+      };
+
+      const actualState = scheduleSlice.reducer(initialState, action);
+
+      expect(actualState).toEqual(expectedState);
     });
   });
 });

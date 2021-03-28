@@ -1,5 +1,5 @@
-import { ScheduledTodo, Todo } from '../../types';
-import { getNowMinute } from '../../utils/utils';
+import { ScheduledTodo, Todo } from 'types';
+import { getNowMinute } from 'utils/utils';
 
 export function addScheduledTodo(
   newScheduledTodo: ScheduledTodo,
