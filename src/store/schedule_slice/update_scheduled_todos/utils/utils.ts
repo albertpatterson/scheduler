@@ -38,6 +38,14 @@ export function removeScheduledTodo(
   index: number,
   currentScheduledTodos: ScheduledTodo[]
 ): ScheduledTodo[] {
+  if (index < 0 || index >= currentScheduledTodos.length) {
+    throw new Error('invalid index');
+  }
+
+  if (currentScheduledTodos.length === 1) {
+    return [];
+  }
+
   const updatedScheduledTodos = currentScheduledTodos.slice();
   const removed = updatedScheduledTodos.splice(index, 1);
   // move the new todo to the front if the first was removed... will require more thought once todos can be completed

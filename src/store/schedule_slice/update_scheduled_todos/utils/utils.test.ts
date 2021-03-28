@@ -151,6 +151,25 @@ describe('removeScheduledTodo', () => {
       updatedScheduledTodos
     );
   });
+
+  test('removes the only item in the list', () => {
+    const removedIndex = 0;
+    const testScheduledTodos = TEST_SCHEDULED_TODOS.slice(0, 1);
+    const updatedScheduledTodos = removeScheduledTodo(
+      removedIndex,
+      testScheduledTodos
+    );
+
+    verifyScheduledTodoOrderAndContent([], [], updatedScheduledTodos);
+  });
+
+  test('errors if the index is invalid', () => {
+    const removedIndex = 1;
+    const testScheduledTodos = TEST_SCHEDULED_TODOS.slice(0, 1);
+    const action = () => removeScheduledTodo(removedIndex, testScheduledTodos);
+
+    expect(action).toThrowError('invalid index');
+  });
 });
 
 describe('updateScheduledTodo', () => {
