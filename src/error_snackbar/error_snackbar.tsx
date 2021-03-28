@@ -1,37 +1,25 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Snackbar from '@material-ui/core/Snackbar';
-import { SELECTORS } from 'store/selectors';
+import { ERROR_SELECTORS, ErrorSelector } from 'store/selectors';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
-enum ErrorType {
-  load,
-  save,
-}
-
-interface ErrorWithType {
+interface ErrorWithSelector {
   error?: string;
-  errorType: ErrorType;
+  errorSelector: ErrorSelector;
 }
 
 export const ErrorSnackbar: FunctionComponent = () => {
-  const [errors, setErrors] = useState<ErrorWithType[]>([]);
+  const [errors, setErrors] = useState<ErrorWithSelector[]>([]);
 
-  const loadScheduledTodosError = useSelector(SELECTORS.schedule.loadError);
-  const saveScheduledTodosError = useSelector(SELECTORS.schedule.saveError);
-
-  useEffect(() => {
-    setErrors((errors) =>
-      addNewError(errors, ErrorType.load, loadScheduledTodosError)
-    );
-  }, [loadScheduledTodosError]);
-
-  useEffect(() => {
-    setErrors((errors) =>
-      addNewError(errors, ErrorType.save, saveScheduledTodosError)
-    );
-  }, [saveScheduledTodosError]);
+  for (const key of Object.keys(ERROR_SELECTORS)) {
+    const selector = ERROR_SELECTORS[key];
+    const error = useSelector(selector);
+    useEffect(() => {
+      setErrors((errors) => addNewError(errors, selector, error));
+    }, [error]);
+  }
 
   const error = errors.length > 0 ? errors[0].error : undefined;
 
@@ -67,16 +55,16 @@ export const ErrorSnackbar: FunctionComponent = () => {
 };
 
 function addNewError(
-  errors: ErrorWithType[],
-  newErrorType: ErrorType,
+  errors: ErrorWithSelector[],
+  selector: ErrorSelector,
   newError?: string
 ) {
-  const filtered = errors.filter((error) => error.errorType !== newErrorType);
+  const filtered = errors.filter((error) => error.errorSelector !== selector);
 
   if (newError) {
-    const newErrorWithType = {
+    const newErrorWithType: ErrorWithSelector = {
       error: newError,
-      errorType: newErrorType,
+      errorSelector: selector,
     };
 
     return [newErrorWithType, ...filtered];

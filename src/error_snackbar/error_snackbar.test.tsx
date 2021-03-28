@@ -10,7 +10,18 @@ const INITIAL_STATE_LOAD_ERROR = {
   schedule: {
     dateNumber: 0,
     scheduledTodos: [],
+    leftoverTodos: [],
     loadError: LOAD_ERROR,
+  },
+};
+
+const LOAD_LEFTOVER_ERROR = 'testing load leftover error';
+const INITIAL_STATE_LOAD_LEFTOVER_ERROR = {
+  schedule: {
+    dateNumber: 0,
+    scheduledTodos: [],
+    leftoverTodos: [],
+    loadLeftoverError: LOAD_LEFTOVER_ERROR,
   },
 };
 
@@ -19,7 +30,18 @@ const INITIAL_STATE_SAVE_ERROR = {
   schedule: {
     dateNumber: 0,
     scheduledTodos: [],
+    leftoverTodos: [],
     saveError: SAVE_ERROR,
+  },
+};
+
+const UPDATE_ERROR = 'testing update error';
+const INITIAL_STATE_UPDATE_ERROR = {
+  schedule: {
+    dateNumber: 0,
+    scheduledTodos: [],
+    leftoverTodos: [],
+    updateError: UPDATE_ERROR,
   },
 };
 
@@ -27,6 +49,7 @@ const INITIAL_STATE_NO_ERROR = {
   schedule: {
     dateNumber: 0,
     scheduledTodos: [],
+    leftoverTodos: [],
   },
 };
 
@@ -73,6 +96,18 @@ describe('ErrorSnackbar', () => {
     renderForInitialState(INITIAL_STATE_SAVE_ERROR);
 
     await waitForAlertWithText(SAVE_ERROR);
+  });
+
+  test('shows a update error', async () => {
+    renderForInitialState(INITIAL_STATE_UPDATE_ERROR);
+
+    await waitForAlertWithText(UPDATE_ERROR);
+  });
+
+  test('shows a loading leftover error', async () => {
+    renderForInitialState(INITIAL_STATE_LOAD_LEFTOVER_ERROR);
+
+    await waitForAlertWithText(LOAD_LEFTOVER_ERROR);
   });
 
   test('shows the latest error', async () => {
