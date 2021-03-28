@@ -1,8 +1,4 @@
-import { current } from '@reduxjs/toolkit';
-import { getDayString } from '../utils/utils';
-
 const LOCAL_STORAGE_SCHEDULE_DAYS_KEY = 'scheduler-schedules-days';
-const LOCAL_STORAGE_SCHEDULE_LATEST_DAY = 'scheduler-schedules-latest-day';
 
 function getLocalStorageDaysWithSchedule(): number[] {
   const data = localStorage.getItem(LOCAL_STORAGE_SCHEDULE_DAYS_KEY);
@@ -14,19 +10,44 @@ function getLocalStorageDaysWithSchedule(): number[] {
   return parsed;
 }
 
-function getLocalStorageLatestDayWithSchedule(): number | null {
-  const data = localStorage.getItem(LOCAL_STORAGE_SCHEDULE_LATEST_DAY);
-  if (!data) {
-    return null;
-  }
-  const parsed = Number(JSON.parse(data));
+function getLocalStorageLatestDayWithSchedule(
+  beforeDateNumber?: number
+): number | null {
+  const daysWithSchedule = getLocalStorageDaysWithSchedule();
 
-  return isNaN(parsed) ? null : parsed;
+  if (beforeDateNumber === undefined) {
+    return daysWithSchedule.length > 0 ? daysWithSchedule[0] : null;
+  }
+
+  for (const dayWithSchedule of daysWithSchedule) {
+    if (dayWithSchedule < beforeDateNumber) {
+      return dayWithSchedule;
+    }
+  }
+
+  return null;
 }
 
-function addLocalStorageDaysWithSchedule(dayNumber: number) {
-  const currentDaysWithSchedules = getLocalStorageDaysWithSchedule();
-  const updatedDaysWithSchedules = [dayNumber, ...currentDaysWithSchedules];
+function addLocalStorageDaysWithSchedule(dateNumber: number) {
+  const currentDaysWithSchedule = getLocalStorageDaysWithSchedule();
+
+  const updatedDaysWithSchedules = [];
+
+  let index = 0;
+  for (const dayWithSchedule of currentDaysWithSchedule) {
+    if (dayWithSchedule > dateNumber) {
+      updatedDaysWithSchedules.push(dayWithSchedule);
+    } else if (dayWithSchedule === dateNumber) {
+      return;
+    } else {
+      updatedDaysWithSchedules.push(dateNumber);
+      break;
+    }
+    index++;
+  }
+
+  updatedDaysWithSchedules.push(...currentDaysWithSchedule.slice(index));
+
   const stringifiedUpdatedDaysWithSchedules = JSON.stringify(
     updatedDaysWithSchedules
   );
@@ -34,17 +55,6 @@ function addLocalStorageDaysWithSchedule(dayNumber: number) {
     LOCAL_STORAGE_SCHEDULE_DAYS_KEY,
     stringifiedUpdatedDaysWithSchedules
   );
-
-  const currentLatestDayWithSchedule = getLocalStorageLatestDayWithSchedule();
-  if (
-    !currentLatestDayWithSchedule ||
-    dayNumber > currentLatestDayWithSchedule
-  ) {
-    localStorage.setItem(
-      LOCAL_STORAGE_SCHEDULE_LATEST_DAY,
-      JSON.stringify(dayNumber)
-    );
-  }
 }
 
 class DaysWithScheduleClient {
@@ -52,13 +62,15 @@ class DaysWithScheduleClient {
     return Promise.resolve(getLocalStorageDaysWithSchedule());
   }
 
-  addDayWithSchedule(dayNumber: number) {
-    addLocalStorageDaysWithSchedule(dayNumber);
+  addDayWithSchedule(dateNumber: number) {
+    addLocalStorageDaysWithSchedule(dateNumber);
     return Promise.resolve();
   }
 
-  getLatestDayWithSchedule(): Promise<number | null> {
-    return Promise.resolve(getLocalStorageLatestDayWithSchedule());
+  getLatestDayWithSchedule(beforeDateNumber?: number): Promise<number | null> {
+    return Promise.resolve(
+      getLocalStorageLatestDayWithSchedule(beforeDateNumber)
+    );
   }
 }
 

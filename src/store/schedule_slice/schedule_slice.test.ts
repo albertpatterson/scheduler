@@ -1,11 +1,12 @@
 import { scheduleSlice, ScheduleSlice } from './schedule_slice';
 import { ScheduledTodo } from 'types';
-import { loadScheduledTodos } from './load_scheduled_todos';
+import { loadScheduledTodos } from './load_scheduled_todos/load_scheduled_todos';
 import { updateScheduledTodos } from './update_scheduled_todos/update_scheduled_todos_base';
 import { saveScheduledTodos } from './update_scheduled_todos/save_scheduled_todos/save_scheduled_todos';
 
 const UNINITIALIZED_STATE: ScheduleSlice = {
   scheduledTodos: [],
+  leftoverTodos: [],
 };
 
 const TEST_TODO = {
@@ -27,6 +28,7 @@ const TEST_SCHEDULED_TODOS: ScheduledTodo[] = [TEST_SCHEDULED_TODO];
 const TEST_DATE_NUMBER = 456;
 
 const INITIALIZED_STATE: ScheduleSlice = {
+  ...UNINITIALIZED_STATE,
   dateNumber: TEST_DATE_NUMBER,
   scheduledTodos: TEST_SCHEDULED_TODOS,
 };
@@ -65,9 +67,9 @@ describe('loadScheduledTodos', () => {
       };
 
       const expectedState = {
+        ...initialState,
         dateNumber: TEST_DATE_NUMBER,
         loadError: testError,
-        scheduledTodos: [],
       };
 
       const actualState = scheduleSlice.reducer(initialState, action);
@@ -83,6 +85,7 @@ describe('updateScheduledTodos', () => {
       const initialState = {
         dateNumber: TEST_DATE_NUMBER,
         scheduledTodos: [],
+        leftoverTodos: [],
         updateError: 'testing',
       };
 

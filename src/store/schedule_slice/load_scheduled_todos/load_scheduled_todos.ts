@@ -1,8 +1,8 @@
 import { createAsyncThunk, AsyncThunkAction } from '@reduxjs/toolkit';
-import { ScheduledTodo } from '../../types';
+import { ScheduledTodo } from '../../../types';
 import { scheduledTodosClient } from 'api/scheduled_todo_client/scheduled_todo_client';
 import { getTodayDayNumber } from 'utils/utils';
-import { PartialStoreType } from './schedule_slice';
+import { PartialStoreType } from '../schedule_slice';
 
 interface LoadScheduledTodosSuccessValue {
   dateNumber: number;

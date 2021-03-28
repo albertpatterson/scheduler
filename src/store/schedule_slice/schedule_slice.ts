@@ -1,11 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ScheduledTodo } from '../../types';
-import { loadScheduledTodos } from './load_scheduled_todos';
+import { loadScheduledTodos } from './load_scheduled_todos/load_scheduled_todos';
+import { loadLeftoverTodos } from './load_leftover_todos/load_leftover_todos';
 import { updateScheduledTodos } from './update_scheduled_todos/update_scheduled_todos_base';
 import { saveScheduledTodos } from './update_scheduled_todos/save_scheduled_todos/save_scheduled_todos';
 
 const DEFAULT_LOAD_SCHEDULED_TODO_ERROR_MESSAGE =
   'An error occured loading scheduled todos';
+
+const DEFAULT_LOAD_LEFTOVER_TODO_ERROR_MESSAGE =
+  'An error occured loading leftover todos';
 
 const DEFAULT_SAVE_SCHEDULED_TODO_ERROR_MESSAGE =
   'An error occured saving scheduled todos';
@@ -16,7 +20,9 @@ const DEFAULT_UPDATE_SCHEDULED_TODO_ERROR_MESSAGE =
 export interface ScheduleSlice {
   dateNumber?: number;
   scheduledTodos: ScheduledTodo[];
+  leftoverTodos: ScheduledTodo[];
   loadError?: string;
+  loadLeftoverError?: string;
   saveError?: string;
   updateError?: string;
 }
@@ -26,6 +32,7 @@ export interface PartialStoreType {
 
 const initialState: ScheduleSlice = {
   scheduledTodos: [],
+  leftoverTodos: [],
 };
 
 export const scheduleSlice = createSlice({
@@ -47,6 +54,23 @@ export const scheduleSlice = createSlice({
       } else {
         clearScheduledTodos(state);
         setLoadError(state, DEFAULT_LOAD_SCHEDULED_TODO_ERROR_MESSAGE);
+      }
+    });
+
+    builder.addCase(loadLeftoverTodos.fulfilled, (state, action) => {
+      const { scheduledTodos } = action.payload;
+      setLeftoverTodos(state, scheduledTodos);
+      setLoadLeftoverError(state, undefined);
+    });
+
+    builder.addCase(loadLeftoverTodos.rejected, (state, action) => {
+      setLeftoverTodos(state, []);
+
+      if (action.payload) {
+        const { error } = action.payload;
+        setLoadLeftoverError(state, error.message);
+      } else {
+        setLoadLeftoverError(state, DEFAULT_LOAD_LEFTOVER_TODO_ERROR_MESSAGE);
       }
     });
 
@@ -89,6 +113,13 @@ function setScheduledTodos(
   state.scheduledTodos = scheduledTodos;
 }
 
+function setLeftoverTodos(
+  state: ScheduleSlice,
+  scheduledTodos: ScheduledTodo[]
+) {
+  state.leftoverTodos = scheduledTodos;
+}
+
 function clearScheduledTodos(state: ScheduleSlice) {
   state.dateNumber = undefined;
   state.scheduledTodos = [];
@@ -102,11 +133,15 @@ function setLoadError(state: ScheduleSlice, loadError?: string) {
   state.loadError = loadError;
 }
 
+function setLoadLeftoverError(state: ScheduleSlice, loadError?: string) {
+  state.loadLeftoverError = loadError;
+}
+
 function setUpdateError(state: ScheduleSlice, updateError?: string) {
   state.updateError = updateError;
 }
 
-export * from './load_scheduled_todos';
+export * from './load_scheduled_todos/load_scheduled_todos';
 export * from './update_scheduled_todos/update_scheduled_todos';
 export * from './update_scheduled_todos/save_scheduled_todos/save_scheduled_todos';
 

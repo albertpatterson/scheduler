@@ -26,6 +26,7 @@ const TEST_SCHEDULED_TODO = {
 const INITIAL_STATE_NO_DATE_NUMBER: PartialStoreType = {
   schedule: {
     scheduledTodos: [],
+    leftoverTodos: [],
   },
 };
 
@@ -33,8 +34,8 @@ const TEST_DATE_NUMBER = 111;
 
 const INITIAL_STATE: PartialStoreType = {
   schedule: {
+    ...INITIAL_STATE_NO_DATE_NUMBER.schedule,
     dateNumber: TEST_DATE_NUMBER,
-    scheduledTodos: [],
   },
 };
 

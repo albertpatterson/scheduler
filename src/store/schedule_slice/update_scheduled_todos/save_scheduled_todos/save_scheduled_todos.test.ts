@@ -26,6 +26,7 @@ const SCHEDULED_TODO = {
 const INITIAL_STATE: PartialStoreType = {
   schedule: {
     scheduledTodos: [],
+    leftoverTodos: [],
   },
 };
 

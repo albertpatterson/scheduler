@@ -29,15 +29,15 @@ export interface DailyScheduleProps {
 export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   props: DailyScheduleProps
 ) => {
-  const todoDayNumber = props.dayNumber || getTodayDayNumber();
+  const dateNumber = props.dayNumber || getTodayDayNumber();
 
   const scheduledTodos = useSelector(SELECTORS.schedule.scheduledTodos);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatchAsyncThunk(dispatch, loadScheduledTodos, todoDayNumber);
-  }, [todoDayNumber]);
+    dispatchAsyncThunk(dispatch, loadScheduledTodos, dateNumber);
+  }, [dateNumber]);
 
   const [showTodoEditor, setShowTodoEditor] = useState(false);
 
@@ -90,7 +90,7 @@ export const DailySchedule: FunctionComponent<DailyScheduleProps> = (
   return (
     <>
       <Typography variant="h2" align="center" paragraph>
-        {parseDate(todoDayNumber)}
+        {parseDate(dateNumber)}
       </Typography>
       <ul className="scheduled-todo-list">
         {scheduledTodos.map((scheduledTodo, index) =>

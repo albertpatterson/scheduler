@@ -1,5 +1,7 @@
 import { ScheduledTodo } from '../../types';
 import { getDayString } from '../../utils/utils';
+import { daysWithScheduleClient } from '../days_with_schedule_client';
+import { getTodayDayNumber } from 'utils/utils';
 
 const LOCAL_STORAGE_SCHEDULE_KEY_PREFIX = 'scheduler-scheduled-';
 function getLocalStorageScheduleKey(dateNumber: number) {
@@ -26,6 +28,10 @@ function setLocalStorageBacklogData(
   localStorage.setItem(key, stringified);
 }
 
+export interface LeftoverTodosData {
+  scheduledTodos: ScheduledTodo[];
+}
+
 export class ScheduledTodosClient {
   get(dateNumber: number): Promise<ScheduledTodo[]> {
     return Promise.resolve(getLoclStorageScheduledTodos(dateNumber));
@@ -37,6 +43,27 @@ export class ScheduledTodosClient {
   ): Promise<Record<string, never>> {
     setLocalStorageBacklogData(dateNumber, scheduledTodos);
     return Promise.resolve({});
+  }
+
+  async getLeftover(): Promise<LeftoverTodosData> {
+    const today = getTodayDayNumber();
+    const latestDayWithSchedule = await daysWithScheduleClient.getLatestDayWithSchedule(
+      today
+    );
+
+    if (latestDayWithSchedule === null) {
+      return {
+        scheduledTodos: [],
+      };
+    }
+
+    const lastScheduledTodos = await this.get(latestDayWithSchedule);
+
+    // add "done" property
+    const leftoverTodos = lastScheduledTodos.filter((todo) => false);
+    return {
+      scheduledTodos: leftoverTodos,
+    };
   }
 }
 

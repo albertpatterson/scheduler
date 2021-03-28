@@ -106,7 +106,7 @@ export const Backlog: FunctionComponent<BacklogProps> = () => {
     const todo = backlogTodos[index];
     dispatchAsyncThunk(dispatch, loadScheduledTodosToday, undefined)
       .then((result) => {
-        if (result.error) {
+        if (result.error && result.error.name !== 'ConditionError') {
           throw result.error;
         }
 
