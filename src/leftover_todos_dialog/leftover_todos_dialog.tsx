@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { SELECTORS } from 'store/selectors';
 import Button from '@material-ui/core/Button';
