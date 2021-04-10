@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { ScheduledTodo } from '../../types';
 import { loadScheduledTodos } from './load_scheduled_todos/load_scheduled_todos';
 import { loadLeftoverTodos } from './load_leftover_todos/load_leftover_todos';
+import { markLeftoverHandled } from './mark_leftover_handled/mark_leftover_handled';
 import { updateScheduledTodos } from './update_scheduled_todos/update_scheduled_todos_base';
 import { saveScheduledTodos } from './update_scheduled_todos/save_scheduled_todos/save_scheduled_todos';
 
@@ -10,6 +11,9 @@ const DEFAULT_LOAD_SCHEDULED_TODO_ERROR_MESSAGE =
 
 const DEFAULT_LOAD_LEFTOVER_TODO_ERROR_MESSAGE =
   'An error occured loading leftover todos';
+
+const DEFAULT_MARK_LEFTOVER_HANDLED_ERROR_MESSAGE =
+  'An error occurd making leftover todos as handled';
 
 const DEFAULT_SAVE_SCHEDULED_TODO_ERROR_MESSAGE =
   'An error occured saving scheduled todos';
@@ -25,6 +29,7 @@ export interface ScheduleSlice {
   loadLeftoverError?: string;
   saveError?: string;
   updateError?: string;
+  markLeftoverError?: string;
 }
 export interface PartialStoreType {
   schedule: ScheduleSlice;
@@ -71,6 +76,24 @@ export const scheduleSlice = createSlice({
         setLoadLeftoverError(state, error.message);
       } else {
         setLoadLeftoverError(state, DEFAULT_LOAD_LEFTOVER_TODO_ERROR_MESSAGE);
+      }
+    });
+
+    builder.addCase(markLeftoverHandled.fulfilled, (state) => {
+      setMarkLeftoverHandledError(state, undefined);
+    });
+
+    builder.addCase(markLeftoverHandled.rejected, (state, action) => {
+      setLeftoverTodos(state, []);
+
+      if (action.payload) {
+        const { error } = action.payload;
+        setMarkLeftoverHandledError(state, error.message);
+      } else {
+        setMarkLeftoverHandledError(
+          state,
+          DEFAULT_MARK_LEFTOVER_HANDLED_ERROR_MESSAGE
+        );
       }
     });
 
@@ -135,6 +158,13 @@ function setLoadError(state: ScheduleSlice, loadError?: string) {
 
 function setLoadLeftoverError(state: ScheduleSlice, loadError?: string) {
   state.loadLeftoverError = loadError;
+}
+
+function setMarkLeftoverHandledError(
+  state: ScheduleSlice,
+  markLeftoverError?: string
+) {
+  state.markLeftoverError = markLeftoverError;
 }
 
 function setUpdateError(state: ScheduleSlice, updateError?: string) {

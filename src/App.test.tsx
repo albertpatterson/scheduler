@@ -12,6 +12,7 @@ import { Dispatch, Action } from 'redux';
 import { loadScheduledTodos } from 'store/schedule_slice/load_scheduled_todos/load_scheduled_todos';
 import * as utils from 'utils/utils';
 import { loadLeftoverTodos } from 'store/schedule_slice/load_leftover_todos/load_leftover_todos';
+import { RootState } from 'store/store';
 
 const mockStore = configureStore();
 
@@ -26,6 +27,11 @@ jest.mock('./error_snackbar/error_snackbar', () => () => mockErrorSnackbarText);
 
 const MOCK_TODAY_DATE_NUMBER = 12345;
 
+const initialState: RootState = {
+  backlog: { backlogTodos: [] },
+  schedule: { scheduledTodos: [], leftoverTodos: [] },
+};
+
 describe('App', () => {
   let history: MemoryHistory;
   let wrappedApp: ReactElement;
@@ -38,7 +44,7 @@ describe('App', () => {
   beforeEach(() => {
     history = createMemoryHistory();
 
-    const store = mockStore({});
+    const store = mockStore(initialState);
 
     wrappedApp = (
       <Provider store={store}>

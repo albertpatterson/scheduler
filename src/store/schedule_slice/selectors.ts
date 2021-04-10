@@ -10,12 +10,15 @@ export const ERROR_SELECTORS: ErrorSelectors = {
   saveError: (state) => state.schedule.saveError,
   loadLeftoverError: (state) => state.schedule.loadLeftoverError,
   updateError: (state) => state.schedule.updateError,
+  markLeftoverError: (state) => state.schedule.markLeftoverError,
 };
 
 export const SELECTORS = {
+  ...ERROR_SELECTORS,
   dateNumber: (state: PartialStoreType): number | undefined =>
     state.schedule.dateNumber,
   scheduledTodos: (state: PartialStoreType): ScheduledTodo[] =>
     state.schedule.scheduledTodos,
-  ...ERROR_SELECTORS,
+  leftoverTodos: (state: PartialStoreType): ScheduledTodo[] =>
+    state.schedule.leftoverTodos,
 };

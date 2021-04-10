@@ -1,18 +1,26 @@
 const LOCAL_STORAGE_SCHEDULE_DAYS_KEY = 'scheduler-schedules-days';
 
-function getLocalStorageDaysWithSchedule(): number[] {
-  const data = localStorage.getItem(LOCAL_STORAGE_SCHEDULE_DAYS_KEY);
-  if (!data) {
-    return [];
-  }
-  const parsed = JSON.parse(data);
+export interface DayWithSchedule {
+  dateNumber: number;
+  leftoversHandled: boolean;
+}
 
-  return parsed;
+const daysWithSchedule = [{ dateNumber: 0, leftoversHandled: false }];
+
+function getLocalStorageDaysWithSchedule(): DayWithSchedule[] {
+  // const data = localStorage.getItem(LOCAL_STORAGE_SCHEDULE_DAYS_KEY);
+  // if (!data) {
+  //   return [];
+  // }
+  // const parsed = JSON.parse(data);
+
+  // return parsed;
+  return daysWithSchedule;
 }
 
 function getLocalStorageLatestDayWithSchedule(
   beforeDateNumber?: number
-): number | null {
+): DayWithSchedule | null {
   const daysWithSchedule = getLocalStorageDaysWithSchedule();
 
   if (beforeDateNumber === undefined) {
@@ -20,7 +28,7 @@ function getLocalStorageLatestDayWithSchedule(
   }
 
   for (const dayWithSchedule of daysWithSchedule) {
-    if (dayWithSchedule < beforeDateNumber) {
+    if (dayWithSchedule.dateNumber < beforeDateNumber) {
       return dayWithSchedule;
     }
   }
@@ -31,16 +39,16 @@ function getLocalStorageLatestDayWithSchedule(
 function addLocalStorageDaysWithSchedule(dateNumber: number) {
   const currentDaysWithSchedule = getLocalStorageDaysWithSchedule();
 
-  const updatedDaysWithSchedules = [];
+  const updatedDaysWithSchedules: DayWithSchedule[] = [];
 
   let index = 0;
   for (const dayWithSchedule of currentDaysWithSchedule) {
-    if (dayWithSchedule > dateNumber) {
+    if (dayWithSchedule.dateNumber > dateNumber) {
       updatedDaysWithSchedules.push(dayWithSchedule);
-    } else if (dayWithSchedule === dateNumber) {
+    } else if (dayWithSchedule.dateNumber === dateNumber) {
       return;
     } else {
-      updatedDaysWithSchedules.push(dateNumber);
+      updatedDaysWithSchedules.push({ dateNumber, leftoversHandled: false });
       break;
     }
     index++;
@@ -48,9 +56,24 @@ function addLocalStorageDaysWithSchedule(dateNumber: number) {
 
   updatedDaysWithSchedules.push(...currentDaysWithSchedule.slice(index));
 
-  const stringifiedUpdatedDaysWithSchedules = JSON.stringify(
-    updatedDaysWithSchedules
-  );
+  setLocalStorageDaysWithSchedule(updatedDaysWithSchedules);
+}
+
+function markLeftoversAsHandledLocalStorage(dateNumber: number) {
+  // const currentDaysWithSchedule = getLocalStorageDaysWithSchedule();
+
+  // const dayWithSchedule = currentDaysWithSchedule.find(
+  //   (dayWithSchedule) => dayWithSchedule.dateNumber === dateNumber
+  // );
+  // if (dayWithSchedule) {
+  //   dayWithSchedule.leftoversHandled = true;
+  //   setLocalStorageDaysWithSchedule(currentDaysWithSchedule);
+  // }
+  daysWithSchedule[0].leftoversHandled = true;
+}
+
+function setLocalStorageDaysWithSchedule(dayWithSchedule: DayWithSchedule[]) {
+  const stringifiedUpdatedDaysWithSchedules = JSON.stringify(dayWithSchedule);
   localStorage.setItem(
     LOCAL_STORAGE_SCHEDULE_DAYS_KEY,
     stringifiedUpdatedDaysWithSchedules
@@ -58,16 +81,23 @@ function addLocalStorageDaysWithSchedule(dateNumber: number) {
 }
 
 class DaysWithScheduleClient {
-  getDaysWithSchedule(): Promise<number[]> {
+  getDaysWithSchedule(): Promise<DayWithSchedule[]> {
     return Promise.resolve(getLocalStorageDaysWithSchedule());
   }
 
-  addDayWithSchedule(dateNumber: number) {
+  addDayWithSchedule(dateNumber: number): Promise<void> {
     addLocalStorageDaysWithSchedule(dateNumber);
     return Promise.resolve();
   }
 
-  getLatestDayWithSchedule(beforeDateNumber?: number): Promise<number | null> {
+  markLeftoverHandled(dateNumber: number): Promise<void> {
+    markLeftoversAsHandledLocalStorage(dateNumber);
+    return Promise.resolve();
+  }
+
+  getLatestDayWithSchedule(
+    beforeDateNumber?: number
+  ): Promise<DayWithSchedule | null> {
     return Promise.resolve(
       getLocalStorageLatestDayWithSchedule(beforeDateNumber)
     );

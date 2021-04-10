@@ -73,6 +73,7 @@ describe('Daily Schedule', () => {
 
     const scheduleSlice: ScheduleSlice = {
       scheduledTodos: [TEST_SCHEDULED_TODO],
+      leftoverTodos: [],
     };
     const initialState = { schedule: scheduleSlice };
     store = mockStore(initialState);

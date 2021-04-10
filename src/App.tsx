@@ -12,6 +12,7 @@ import { dispatchAsyncThunk } from 'store/dispatch_async_thunk';
 import { useDispatch } from 'react-redux';
 import { loadScheduledTodos } from 'store/schedule_slice/load_scheduled_todos/load_scheduled_todos';
 import { loadLeftoverTodos } from 'store/schedule_slice/load_leftover_todos/load_leftover_todos';
+import { LeftoverTodosDialog } from 'leftover_todos_dialog/leftover_todos_dialog';
 
 function App(): ReactElement {
   const [todayDateNumber, setTodayDateNumber] = useState(getTodayDayNumber());
@@ -47,6 +48,7 @@ function App(): ReactElement {
           </Route>
         </Switch>
         <ErrorSnackbar />
+        <LeftoverTodosDialog />
       </Container>
     </>
   );

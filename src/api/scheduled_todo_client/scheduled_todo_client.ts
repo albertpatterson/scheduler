@@ -34,6 +34,25 @@ export interface LeftoverTodosData {
 
 export class ScheduledTodosClient {
   get(dateNumber: number): Promise<ScheduledTodo[]> {
+    if (dateNumber === 0) {
+      return Promise.resolve([
+        {
+          title: 'testin 1',
+          description: 'asdf',
+          estimate: 1,
+          priority: 1,
+          start: 12,
+        },
+        {
+          title: 'testin 2',
+          description: 'asdf',
+          estimate: 1,
+          priority: 1,
+          start: 12,
+        },
+      ]);
+    }
+
     return Promise.resolve(getLoclStorageScheduledTodos(dateNumber));
   }
 
@@ -51,19 +70,37 @@ export class ScheduledTodosClient {
       today
     );
 
-    if (latestDayWithSchedule === null) {
+    if (
+      latestDayWithSchedule === null ||
+      latestDayWithSchedule.leftoversHandled
+    ) {
       return {
         scheduledTodos: [],
       };
     }
 
-    const lastScheduledTodos = await this.get(latestDayWithSchedule);
+    const lastScheduledTodos = await this.get(latestDayWithSchedule.dateNumber);
 
     // add "done" property
-    const leftoverTodos = lastScheduledTodos.filter((todo) => false);
+    const leftoverTodos = lastScheduledTodos.filter((todo) => true);
     return {
       scheduledTodos: leftoverTodos,
     };
+  }
+
+  async markLeftoverHandled(): Promise<void> {
+    const today = getTodayDayNumber();
+    const latestDayWithSchedule = await daysWithScheduleClient.getLatestDayWithSchedule(
+      today
+    );
+
+    if (!latestDayWithSchedule) {
+      return;
+    }
+
+    return daysWithScheduleClient.markLeftoverHandled(
+      latestDayWithSchedule?.dateNumber
+    );
   }
 }
 
